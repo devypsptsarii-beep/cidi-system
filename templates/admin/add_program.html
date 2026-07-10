@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Add Program - Admin{% endblock %}
+{% block content %}
+<div class="dashboard">
+    <div class="dashboard-header">
+        <h1><i class="fas fa-plus-circle"></i> Add Training Program</h1>
+        <a href="{{ url_for('admin.programs') }}" class="btn-back">
+            <i class="fas fa-arrow-left"></i> Back
+        </a>
+    </div>
+    <div class="form-card">
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="form-group">
+                <label>Program Title</label>
+                <input type="text" name="title" placeholder="e.g. IoT Fundamentals for Industry 4.0" required>
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea name="description" rows="4" placeholder="Describe the training program..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>Skill Category</label>
+                <select name="skill_category" required>
+                    <option value="">-- Select Skill --</option>
+                    <option value="IoT (Internet of Things)">IoT (Internet of Things)</option>
+                    <option value="Artificial Intelligence">Artificial Intelligence</option>
+                    <option value="Big Data Analytics">Big Data Analytics</option>
+                    <option value="Cybersecurity">Cybersecurity</option>
+                    <option value="Cloud Computing">Cloud Computing</option>
+                    <option value="Robotics & Automation">Robotics & Automation</option>
+                    <option value="3D Printing">3D Printing</option>
+                    <option value="Digital Manufacturing">Digital Manufacturing</option>
+                </select>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Start Date</label>
+                    <input type="date" name="start_date" required>
+                </div>
+                <div class="form-group">
+                    <label>End Date</label>
+                    <input type="date" name="end_date" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Capacity (max participants)</label>
+                    <input type="number" name="capacity" min="1" placeholder="e.g. 30" required>
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select name="status">
+                        <option value="open">Open</option>
+                        <option value="ongoing">Ongoing</option>
+                        <option value="completed">Completed</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn-submit">
+                <i class="fas fa-save"></i> Save Program
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

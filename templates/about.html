@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block title %}About & Contact - CIDI 4.0{% endblock %}
+{% block content %}
+
+<!-- ABOUT HERO -->
+<section class="about-hero">
+    <div class="section-container">
+        <h1>About CIDI 4.0</h1>
+        <p>Center for Digital Industry 4.0 — Developing the next generation of Industry 4.0 professionals</p>
+    </div>
+</section>
+
+<!-- ABOUT CONTENT -->
+<section class="about-section">
+    <div class="section-container">
+        <div class="about-grid">
+            <div class="about-card">
+                <div class="about-icon"><i class="fas fa-bullseye"></i></div>
+                <h3>Our Mission</h3>
+                <p>To bridge the gap between Industry 4.0 workforce demand and supply by providing structured training, certification, and placement services for skilled professionals.</p>
+            </div>
+            <div class="about-card">
+                <div class="about-icon"><i class="fas fa-eye"></i></div>
+                <h3>Our Vision</h3>
+                <p>To become the leading center for Industry 4.0 workforce development, connecting certified professionals with industries across the region.</p>
+            </div>
+            <div class="about-card">
+                <div class="about-icon"><i class="fas fa-star"></i></div>
+                <h3>Our Values</h3>
+                <p>Excellence, Innovation, Integrity, and Collaboration. We are committed to delivering world-class training and certification programs.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- WHAT WE DO -->
+<section class="what-we-do">
+    <div class="section-container">
+        <h2>What We Do</h2>
+        <p class="section-subtitle">A complete ecosystem for Industry 4.0 workforce development</p>
+        <div class="services-grid">
+            <div class="service-item">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <h4>Training Programs</h4>
+                <p>Structured Industry 4.0 training covering IoT, AI, Big Data, Cybersecurity, Cloud Computing, Robotics and more.</p>
+            </div>
+            <div class="service-item">
+                <i class="fas fa-certificate"></i>
+                <h4>Digital Certification</h4>
+                <p>Internationally recognized digital certificates issued upon successful completion of training programs.</p>
+            </div>
+            <div class="service-item">
+                <i class="fas fa-database"></i>
+                <h4>Workforce Database</h4>
+                <p>A comprehensive database of certified Industry 4.0 professionals accessible to industries and institutions.</p>
+            </div>
+            <div class="service-item">
+                <i class="fas fa-handshake"></i>
+                <h4>Industry Matching</h4>
+                <p>Connecting certified workforce with industries, government bodies, and institutions that need Industry 4.0 skills.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact-section">
+    <div class="section-container">
+        <h2>Contact Us</h2>
+        <p class="section-subtitle">Get in touch with our team</p>
+        <div class="contact-grid">
+            <div class="contact-info">
+                <div class="contact-item">
+                    <div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div>
+                    <div>
+                        <h4>Address</h4>
+                        <p>Jl. Industry 4.0 No. 1<br>Indonesia</p>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon"><i class="fas fa-envelope"></i></div>
+                    <div>
+                        <h4>Email</h4>
+                        <p>info@cidi40.com</p>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon"><i class="fas fa-phone"></i></div>
+                    <div>
+                        <h4>Phone</h4>
+                        <p>+62 800 0000 0000</p>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon"><i class="fas fa-clock"></i></div>
+                    <div>
+                        <h4>Office Hours</h4>
+                        <p>Monday - Friday<br>08:00 - 17:00 WIB</p>
+                    </div>
+                </div>
+            </div>
+            <div class="contact-form-card">
+                <h3>Send us a Message</h3>
+                <form id="contact-form">
+                    <div class="form-group">
+                        <label>Your Name</label>
+                        <input type="text" placeholder="Enter your name">
+                    </div>
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" placeholder="Enter your email">
+                    </div>
+                    <div class="form-group">
+                        <label>Subject</label>
+                        <input type="text" placeholder="What is this about?">
+                    </div>
+                    <div class="form-group">
+                        <label>Message</label>
+                        <textarea rows="5" placeholder="Write your message here..."></textarea>
+                    </div>
+                    <button type="button" onclick="alert('Thank you! We will get back to you soon.')" class="btn-submit">
+                        <i class="fas fa-paper-plane"></i> Send Message
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

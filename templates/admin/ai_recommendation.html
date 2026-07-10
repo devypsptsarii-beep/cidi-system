@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}AI Training Recommendation - Admin{% endblock %}
+{% block content %}
+<div class="dashboard">
+    <div class="dashboard-header">
+        <h1><i class="fas fa-robot"></i> AI Training Recommendation</h1>
+        <a href="{{ url_for('admin.dashboard') }}" class="btn-back">
+            <i class="fas fa-arrow-left"></i> Back
+        </a>
+    </div>
+
+    <!-- EXPLANATION -->
+    <div class="ai-intro-card">
+        <div class="ai-intro-icon"><i class="fas fa-brain"></i></div>
+        <div class="ai-intro-text">
+            <h3>How It Works</h3>
+            <p>Select one or more workforce demand requests from the list below. The AI will analyze the job positions, machines used, skill requirements, and urgency levels, then recommend the most suitable training program to conduct.</p>
+        </div>
+    </div>
+
+    <!-- DEMAND SELECTION FORM -->
+    <form method="POST" action="{{ url_for('admin.ai_analyze') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="ai-section-header">
+            <h2>
+                <i class="fas fa-list-check"></i>
+                Select Demands to Analyze
+                {% if pending_demands %}
+                <span class="badge badge-pending" style="font-size:0.8rem;">
+                    {{ pending_demands|length }} pending
+                </span>
+                {% endif %}
+            </h2>
+            <button type="submit" class="btn-ai">
+                <i class="fas fa-robot"></i> Analyze with AI
+            </button>
+        </div>
+
+        {% if all_demands %}
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th style="width:40px;">
+                            <input type="checkbox" id="select-all"
+                                   onchange="toggleAll(this)">
+                        </th>
+                        <th>Industry</th>
+                        <th>Skill Required</th>
+                        <th>Job Position</th>
+                        <th>Machines Used</th>
+                        <th>Qty</th>
+                        <th>Urgency</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for demand in all_demands %}
+                    <tr>
+                        <td>
+                            <input type="checkbox" name="demand_ids"
+                                   value="{{ demand.id }}"
+                                   class="demand-check"
+                                   {% if demand.status == 'pending' %}checked{% endif %}>
+                        </td>
+                        <td>
+                            <strong>
+                                {{ demand.user.industry_profile.industry_name
+                                   if demand.user.industry_profile
+                                   else demand.user.email }}
+                            </strong>
+                        </td>
+                        <td>
+                            <span class="skill-tag">{{ demand.skill_required }}</span>
+                        </td>
+                        <td>{{ demand.job_position or '-' }}</td>
+                        <td>
+                            <span style="font-size:0.8rem;color:var(--gray);">
+                                {{ demand.machines_used[:50] + '...'
+                                   if demand.machines_used and demand.machines_used|length > 50
+                                   else demand.machines_used or '-' }}
+                            </span>
+                        </td>
+                        <td>{{ demand.quantity }}</td>
+                        <td>
+                            <span style="font-size:0.8rem;">
+                                {{ demand.urgency_level or '-' }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge badge-{{ demand.status }}">
+                                {{ demand.status }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="not-available">
+            <i class="fas fa-inbox"></i>
+            <h3>No Demands Yet</h3>
+            <p>Industries need to submit workforce demands first.</p>
+        </div>
+        {% endif %}
+    </form>
+</div>
+
+<script>
+function toggleAll(source) {
+    document.querySelectorAll('.demand-check').forEach(cb => {
+        cb.checked = source.checked;
+    });
+}
+</script>
+{% endblock %}

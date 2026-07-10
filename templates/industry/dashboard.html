@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Industry Dashboard - CIDI 4.0{% endblock %}
+{% block content %}
+<div class="dashboard">
+    <div class="dashboard-header">
+        <h1><i class="fas fa-building"></i>
+            {{ profile.industry_name if profile else 'Industry Dashboard' }}
+        </h1>
+        <p>{{ profile.sector if profile else '' }}</p>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card blue">
+            <div class="stat-icon"><i class="fas fa-file-alt"></i></div>
+            <div class="stat-info"><h3>{{ total_demands }}</h3><p>Total Demands</p></div>
+        </div>
+        <div class="stat-card green">
+            <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+            <div class="stat-info"><h3>{{ fulfilled }}</h3><p>Fulfilled</p></div>
+        </div>
+        <div class="stat-card orange">
+            <div class="stat-icon"><i class="fas fa-clock"></i></div>
+            <div class="stat-info"><h3>{{ pending }}</h3><p>Pending</p></div>
+        </div>
+        <div class="stat-card red">
+            <div class="stat-icon"><i class="fas fa-times-circle"></i></div>
+            <div class="stat-info"><h3>{{ not_available }}</h3><p>Not Available</p></div>
+        </div>
+    </div>
+
+    <div class="quick-actions">
+        <h2>Quick Actions</h2>
+        <div class="action-grid">
+            <a href="{{ url_for('industry.submit_demand') }}" class="action-card">
+                <i class="fas fa-plus-circle"></i>
+                <span>Submit Workforce Demand</span>
+            </a>
+            <a href="{{ url_for('industry.workforce') }}" class="action-card">
+                <i class="fas fa-database"></i>
+                <span>View Certified Workforce</span>
+            </a>
+            <a href="{{ url_for('industry.my_demands') }}" class="action-card">
+                <i class="fas fa-list"></i>
+                <span>My Demand Requests</span>
+            </a>
+            <a href="{{ url_for('industry.edit_profile') }}" class="action-card">
+                <i class="fas fa-building"></i>
+                <span>Edit Profile</span>
+            </a>
+            <a href="{{ url_for('industry.change_password') }}" class="action-card">
+                <i class="fas fa-key"></i>
+                <span>Change Password</span>
+            </a>
+        </div>
+    </div>
+
+    {% if my_demands %}
+    <div class="recent-section">
+        <h2>Recent Demand Requests</h2>
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Skill</th><th>Quantity</th><th>Status</th><th>Date</th></tr>
+                </thead>
+                <tbody>
+                    {% for demand in my_demands %}
+                    <tr>
+                        <td>{{ demand.skill_required }}</td>
+                        <td>{{ demand.quantity }}</td>
+                        <td><span class="badge badge-{{ demand.status }}">{{ demand.status }}</span></td>
+                        <td>{{ demand.submitted_at.strftime('%d %b %Y') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

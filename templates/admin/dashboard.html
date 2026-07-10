@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard - CIDI 4.0{% endblock %}
+{% block content %}
+<div class="dashboard">
+    <div class="dashboard-header">
+        <h1><i class="fas fa-user-shield"></i> Admin Dashboard</h1>
+        <p>Welcome back! Here's an overview of the CIDI 4.0 System.</p>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card blue">
+            <div class="stat-icon"><i class="fas fa-user-graduate"></i></div>
+            <div class="stat-info"><h3>{{ total_participants }}</h3><p>Total Participants</p></div>
+        </div>
+        <div class="stat-card green">
+            <div class="stat-icon"><i class="fas fa-certificate"></i></div>
+            <div class="stat-info"><h3>{{ total_certified }}</h3><p>Certificates Issued</p></div>
+        </div>
+        <div class="stat-card orange">
+            <div class="stat-icon"><i class="fas fa-building"></i></div>
+            <div class="stat-info"><h3>{{ total_industries }}</h3><p>Registered Industries</p></div>
+        </div>
+        <div class="stat-card purple">
+            <div class="stat-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+            <div class="stat-info"><h3>{{ total_programs }}</h3><p>Training Programs</p></div>
+        </div>
+    </div>
+
+    {% if pending_industries > 0 %}
+    <div class="alert alert-warning">
+        <i class="fas fa-exclamation-triangle"></i>
+        <strong>{{ pending_industries }}</strong> industry account(s) waiting for approval.
+        <a href="{{ url_for('admin.industries') }}" class="alert-link">Review now →</a>
+    </div>
+    {% endif %}
+    {% if pending_registrations > 0 %}
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i>
+        <strong>{{ pending_registrations }}</strong> training registration(s) waiting for approval.
+        <a href="{{ url_for('admin.registrations') }}" class="alert-link">Review now →</a>
+    </div>
+    {% endif %}
+
+    <!-- CHARTS -->
+    <div class="charts-grid">
+        <div class="chart-card">
+            <h3><i class="fas fa-chart-bar"></i> Certifications by Skill</h3>
+            <canvas id="skillChart"></canvas>
+        </div>
+        <div class="chart-card">
+            <h3><i class="fas fa-chart-pie"></i> Employment Status</h3>
+            <canvas id="statusChart"></canvas>
+        </div>
+        <div class="chart-card chart-full">
+            <h3><i class="fas fa-chart-line"></i> Certificates Issued per Month</h3>
+            <canvas id="monthlyChart"></canvas>
+        </div>
+    </div>
+
+    <!-- QUICK ACTIONS -->
+    <div class="quick-actions">
+        <h2>Quick Actions</h2>
+        <div class="action-grid">
+            <a href="{{ url_for('admin.add_program') }}" class="action-card">
+                <i class="fas fa-plus-circle"></i>
+                <span>Add Training Program</span>
+            </a>
+            <a href="{{ url_for('admin.registrations') }}" class="action-card">
+                <i class="fas fa-user-check"></i>
+                <span>Approve Registrations</span>
+            </a>
+            <a href="{{ url_for('admin.industries') }}" class="action-card">
+                <i class="fas fa-building"></i>
+                <span>Manage Industries</span>
+            </a>
+            <a href="{{ url_for('admin.certificates') }}" class="action-card">
+                <i class="fas fa-certificate"></i>
+                <span>View Certificates</span>
+            </a>
+            <a href="{{ url_for('admin.demands') }}" class="action-card">
+                <i class="fas fa-file-alt"></i>
+                <span>Workforce Demands</span>
+            </a>
+            <a href="{{ url_for('admin.participants') }}" class="action-card">
+                <i class="fas fa-users"></i>
+                <span>View Participants</span>
+            </a>
+            <a href="{{ url_for('admin.all_users') }}" class="action-card">
+                <i class="fas fa-users-cog"></i>
+                <span>All User Accounts</span>
+            </a>
+            <a href="{{ url_for('admin.change_password') }}" class="action-card">
+                <i class="fas fa-key"></i>
+                <span>Change Password</span>
+            </a>
+            <a href="{{ url_for('admin.ai_recommendation') }}" class="action-card"
+               style="border-color:#f97316;border-width:2px;">
+                <i class="fas fa-robot" style="color:#f97316;"></i>
+                <span>AI Training Recommendation</span>
+            </a>
+        </div>
+    </div>
+
+    {% if recent_demands %}
+    <div class="recent-section">
+        <h2>Recent Workforce Demands</h2>
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Skill Required</th>
+                        <th>Quantity</th>
+                        <th>Status</th>
+                        <th>Submitted</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for demand in recent_demands %}
+                    <tr>
+                        <td>{{ demand.skill_required }}</td>
+                        <td>{{ demand.quantity }}</td>
+                        <td>
+                            <span class="badge badge-{{ demand.status }}">
+                                {{ demand.status }}
+                            </span>
+                        </td>
+                        <td>{{ demand.submitted_at.strftime('%d %b %Y') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script>
+const skillLabels   = {{ skill_labels | tojson }};
+const skillCounts   = {{ skill_counts | tojson }};
+const monthlyLabels = {{ monthly_labels | tojson }};
+const monthlyCounts = {{ monthly_counts | tojson }};
+const employed      = {{ employed }};
+const unemployed    = {{ unemployed }};
+
+new Chart(document.getElementById('skillChart'), {
+    type: 'bar',
+    data: {
+        labels: skillLabels.length ? skillLabels : ['No data yet'],
+        datasets: [{
+            label: 'Certified Workers',
+            data: skillCounts.length ? skillCounts : [0],
+            backgroundColor: '#1a56db',
+            borderRadius: 6
+        }]
+    },
+    options: { responsive: true, plugins: { legend: { display: false } } }
+});
+
+new Chart(document.getElementById('statusChart'), {
+    type: 'doughnut',
+    data: {
+        labels: ['Employed', 'Unemployed'],
+        datasets: [{
+            data: [employed, unemployed],
+            backgroundColor: ['#10b981', '#f97316']
+        }]
+    },
+    options: { responsive: true }
+});
+
+new Chart(document.getElementById('monthlyChart'), {
+    type: 'line',
+    data: {
+        labels: monthlyLabels,
+        datasets: [{
+            label: 'Certificates Issued',
+            data: monthlyCounts,
+            borderColor: '#1a56db',
+            backgroundColor: 'rgba(26,86,219,0.1)',
+            fill: true,
+            tension: 0.4
+        }]
+    },
+    options: { responsive: true }
+});
+</script>
+{% endblock %}

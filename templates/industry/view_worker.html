@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Worker Profile - CIDI 4.0{% endblock %}
+{% block content %}
+<div class="dashboard">
+    <div class="dashboard-header">
+        <h1><i class="fas fa-user"></i> Certified Worker Profile</h1>
+        <a href="{{ url_for('industry.workforce') }}" class="btn-back">
+            <i class="fas fa-arrow-left"></i> Back
+        </a>
+    </div>
+
+    <div class="profile-grid">
+        <div class="profile-card">
+            <div class="profile-avatar">
+                <i class="fas fa-user-graduate"></i>
+            </div>
+            <h2>{{ profile.full_name }}</h2>
+            <span class="badge badge-{{ 'fulfilled' if profile.working_status == 'employed' else 'pending' }}">
+                {{ profile.working_status or 'unemployed' }}
+            </span>
+            <div class="profile-details">
+                <div class="detail-row">
+                    <span class="detail-label"><i class="fas fa-venus-mars"></i> Gender</span>
+                    <span>{{ profile.gender }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label"><i class="fas fa-birthday-cake"></i> Age</span>
+                    <span>{{ profile.age }} years old</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label"><i class="fas fa-city"></i> City</span>
+                    <span>{{ profile.city or '-' }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label"><i class="fas fa-phone"></i> Phone</span>
+                    <span>{{ profile.phone_number }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label"><i class="fas fa-graduation-cap"></i> Education</span>
+                    <span>{{ profile.education }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-right">
+            <div class="profile-section">
+                <h3><i class="fas fa-certificate"></i> Certifications ({{ certs|length }})</h3>
+                {% if certs %}
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr><th>Certificate No</th><th>Skill</th><th>Program</th><th>Issued</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for cert in certs %}
+                            <tr>
+                                <td><code>{{ cert.certificate_no }}</code></td>
+                                <td><span class="skill-tag">{{ cert.skill_certified }}</span></td>
+                                <td>{{ cert.program.title }}</td>
+                                <td>{{ cert.issued_date.strftime('%d %b %Y') }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="empty-text">No certificates found.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

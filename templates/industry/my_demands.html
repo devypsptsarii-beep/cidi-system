@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}My Demands - CIDI 4.0{% endblock %}
+{% block content %}
+<div class="dashboard">
+    <div class="dashboard-header">
+        <h1><i class="fas fa-list"></i> My Demand Requests</h1>
+        <a href="{{ url_for('industry.submit_demand') }}" class="btn-action">
+            <i class="fas fa-plus"></i> New Demand
+        </a>
+    </div>
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Skill Required</th>
+                    <th>Quantity</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                    <th>Submitted</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for demand in demands %}
+                <tr>
+                    <td><strong>{{ demand.skill_required }}</strong></td>
+                    <td>{{ demand.quantity }}</td>
+                    <td>{{ demand.description or '-' }}</td>
+                    <td><span class="badge badge-{{ demand.status }}">{{ demand.status }}</span></td>
+                    <td>{{ demand.submitted_at.strftime('%d %b %Y') }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5" class="empty-row">No demands submitted yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

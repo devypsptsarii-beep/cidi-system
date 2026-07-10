@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Login - CIDI 4.0{% endblock %}
+
+{% block content %}
+<section class="auth-section">
+    <div class="auth-container">
+        <div class="auth-header">
+            <div class="auth-icon"><i class="fas fa-sign-in-alt"></i></div>
+            <h2>Welcome Back</h2>
+            <p>Login to access the CIDI 4.0 System</p>
+        </div>
+        <form method="POST" action="{{ url_for('auth.login') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token is defined else '' }}">
+            <div class="form-group">
+                <label for="email"><i class="fas fa-envelope"></i> Email Address</label>
+                <input type="email" id="email" name="email" placeholder="Enter your email" required>
+            </div>
+            <div class="form-group">
+                <label for="password"><i class="fas fa-lock"></i> Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            </div>
+            <button type="submit" class="btn-submit">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </button>
+        </form>
+        <div class="auth-footer">
+            <p>Don't have an account? <a href="{{ url_for('auth.register') }}">Register here</a></p>
+        </div>
+    </div>
+</section>
+{% endblock %}

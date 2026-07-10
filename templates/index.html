@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+{% block title %}CIDI 4.0 - Home{% endblock %}
+
+{% block content %}
+
+<!-- HERO SECTION -->
+<section class="hero">
+    <div class="hero-content">
+        <div class="hero-badge">Industry 4.0 Workforce Development</div>
+        <h1>Center for Digital Industry 4.0</h1>
+        <p>Connecting certified Industry 4.0 professionals with industries, institutions, and government bodies. Building the future workforce through structured training and certification.</p>
+        <div class="hero-buttons">
+            <a href="{{ url_for('auth.register') }}" class="btn-primary">
+                <i class="fas fa-user-plus"></i> Register Now
+            </a>
+        </div>
+    </div>
+    <div class="hero-image">
+        <div class="hero-stats-box">
+            <div class="hero-stat">
+                <i class="fas fa-user-graduate"></i>
+                <span>Certified Workforce</span>
+            </div>
+            <div class="hero-stat">
+                <i class="fas fa-certificate"></i>
+                <span>Digital Certificates</span>
+            </div>
+            <div class="hero-stat">
+                <i class="fas fa-building"></i>
+                <span>Industry Partners</span>
+            </div>
+            <div class="hero-stat">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span>Training Programs</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-it-works">
+    <div class="section-container">
+        <h2>How It Works</h2>
+        <p class="section-subtitle">A complete end-to-end system for Industry 4.0 workforce development</p>
+        <div class="steps-grid">
+            <div class="step-card">
+                <div class="step-icon"><i class="fas fa-file-alt"></i></div>
+                <div class="step-number">01</div>
+                <h3>Submit Demand</h3>
+                <p>Industries and institutions submit their workforce demand requests for Industry 4.0 skills.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-icon"><i class="fas fa-search"></i></div>
+                <div class="step-number">02</div>
+                <h3>Search Database</h3>
+                <p>The system searches the certified workforce database to match available talent.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+                <div class="step-number">03</div>
+                <h3>Training Program</h3>
+                <p>Individuals register and complete CIDI training programs to gain Industry 4.0 skills.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-icon"><i class="fas fa-certificate"></i></div>
+                <div class="step-number">04</div>
+                <h3>Get Certified</h3>
+                <p>Graduates receive digital certificates and are recorded in the certified workforce database.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- OPEN TRAINING PROGRAMS -->
+<section class="home-programs">
+    <div class="section-container">
+        <h2>Open Training Programs</h2>
+        <p class="section-subtitle">Register now to develop your Industry 4.0 skills</p>
+        {% if open_programs %}
+        <div class="programs-grid">
+            {% for program in open_programs %}
+            <div class="program-card">
+                <div class="program-header status-{{ program.status }}">
+                    <span class="badge badge-{{ program.status }}">{{ program.status }}</span>
+                    <span class="skill-tag">{{ program.skill_category }}</span>
+                </div>
+                <div class="program-body">
+                    <h3>{{ program.title }}</h3>
+                    <p>{{ program.description or 'No description provided.' }}</p>
+                    <div class="program-meta">
+                        <span><i class="fas fa-calendar"></i> {{ program.start_date.strftime('%d %b %Y') }}</span>
+                        <span><i class="fas fa-calendar-check"></i> {{ program.end_date.strftime('%d %b %Y') }}</span>
+                        <span><i class="fas fa-users"></i> Capacity: {{ program.capacity }}</span>
+                    </div>
+                </div>
+                <div class="program-footer">
+                    <a href="{{ url_for('auth.register') }}?role=participant" class="btn-submit"
+                       style="text-decoration:none;display:block;text-align:center;">
+                        <i class="fas fa-user-plus"></i> Register to Join
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="not-available">
+            <i class="fas fa-book"></i>
+            <h3>No Open Programs Yet</h3>
+            <p>Check back soon for upcoming training programs.</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- WHO CAN USE THIS -->
+<section class="user-types">
+    <div class="section-container">
+        <h2>Who Uses This System?</h2>
+        <div class="user-cards">
+            <div class="user-card">
+                <div class="user-icon industry-icon"><i class="fas fa-building"></i></div>
+                <h3>Industry / Institution / Government</h3>
+                <ul>
+                    <li><i class="fas fa-check"></i> Submit workforce demand requests</li>
+                    <li><i class="fas fa-check"></i> View certified workforce database</li>
+                    <li><i class="fas fa-check"></i> Track demand request status</li>
+                </ul>
+                <a href="{{ url_for('auth.register') }}?role=industry" class="btn-card">Register as Industry</a>
+            </div>
+            <div class="user-card featured">
+                <div class="user-icon admin-icon"><i class="fas fa-user-shield"></i></div>
+                <h3>Administrator</h3>
+                <ul>
+                    <li><i class="fas fa-check"></i> Manage training programs</li>
+                    <li><i class="fas fa-check"></i> Approve participant registrations</li>
+                    <li><i class="fas fa-check"></i> Issue digital certificates</li>
+                </ul>
+                <a href="{{ url_for('auth.login') }}" class="btn-card">Admin Login</a>
+            </div>
+            <div class="user-card">
+                <div class="user-icon participant-icon"><i class="fas fa-user-graduate"></i></div>
+                <h3>Individual / Participant</h3>
+                <ul>
+                    <li><i class="fas fa-check"></i> Register for training programs</li>
+                    <li><i class="fas fa-check"></i> Track training progress</li>
+                    <li><i class="fas fa-check"></i> Download digital certificates</li>
+                </ul>
+                <a href="{{ url_for('auth.register') }}?role=participant" class="btn-card">Register as Participant</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

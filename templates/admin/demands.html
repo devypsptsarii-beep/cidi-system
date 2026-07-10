@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% block title %}Workforce Demands - Admin{% endblock %}
+{% block content %}
+<div class="dashboard">
+    <div class="dashboard-header">
+        <h1><i class="fas fa-file-alt"></i> Workforce Demands</h1>
+        <a href="{{ url_for('admin.ai_recommendation') }}" class="btn-ai"
+           style="text-decoration:none;">
+            <i class="fas fa-robot"></i> AI Recommendation
+        </a>
+    </div>
+
+    <!-- FILTER BAR -->
+    <div class="filter-bar">
+        <form method="GET" class="filter-form">
+            <input type="text" name="skill" value="{{ request.args.get('skill','') }}"
+                   placeholder="Filter by skill..." class="filter-input">
+            <select name="status" class="filter-input">
+                <option value="">All Status</option>
+                <option value="pending"
+                    {% if request.args.get('status') == 'pending' %}selected{% endif %}>
+                    Pending
+                </option>
+                <option value="fulfilled"
+                    {% if request.args.get('status') == 'fulfilled' %}selected{% endif %}>
+                    Fulfilled
+                </option>
+                <option value="not_available"
+                    {% if request.args.get('status') == 'not_available' %}selected{% endif %}>
+                    Not Available
+                </option>
+            </select>
+            <button type="submit" class="btn-action">
+                <i class="fas fa-filter"></i> Filter
+            </button>
+            <a href="{{ url_for('admin.demands') }}" class="btn-back">
+                <i class="fas fa-times"></i> Clear
+            </a>
+        </form>
+    </div>
+
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Industry</th>
+                    <th>Skill Required</th>
+                    <th>Job Position</th>
+                    <th>Machines Used</th>
+                    <th>Qty</th>
+                    <th>Experience</th>
+                    <th>Urgency</th>
+                    <th>Status</th>
+                    <th>Submitted</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for demand in demands %}
+                <tr>
+                    <td>
+                        <strong>
+                            {{ demand.user.industry_profile.industry_name
+                               if demand.user.industry_profile
+                               else demand.user.email }}
+                        </strong>
+                    </td>
+                    <td>
+                        <a href="{{ url_for('admin.demands') }}?skill={{ demand.skill_required }}"
+                           class="skill-tag"
+                           style="text-decoration:none;cursor:pointer;">
+                            {{ demand.skill_required }}
+                        </a>
+                    </td>
+                    <td>{{ demand.job_position or '-' }}</td>
+                    <td>
+                        <span style="font-size:0.8rem;color:var(--gray);">
+                            {{ demand.machines_used[:40] + '...'
+                               if demand.machines_used and demand.machines_used|length > 40
+                               else demand.machines_used or '-' }}
+                        </span>
+                    </td>
+                    <td>{{ demand.quantity }}</td>
+                    <td>
+                        <span style="font-size:0.8rem;">
+                            {{ demand.experience_level or '-' }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if demand.urgency_level %}
+                        <span class="badge badge-{{
+                            'danger' if 'Immediate' in demand.urgency_level
+                            else 'warning' if '1-3' in demand.urgency_level
+                            else 'approved' }}">
+                            {{ demand.urgency_level }}
+                        </span>
+                        {% else %} - {% endif %}
+                    </td>
+                    <td>
+                        <span class="badge badge-{{ demand.status }}">
+                            {{ demand.status }}
+                        </span>
+                    </td>
+                    <td>{{ demand.submitted_at.strftime('%d %b %Y') }}</td>
+                    <td>
+                        <a href="{{ url_for('admin.view_demand', id=demand.id) }}"
+                           class="btn-primary-sm">
+                            <i class="fas fa-eye"></i> View
+                        </a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="10" class="empty-row">
+                        No workforce demands yet.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}My Certificates - CIDI 4.0{% endblock %}
+{% block content %}
+<div class="dashboard">
+    <div class="dashboard-header">
+        <h1><i class="fas fa-certificate"></i> My Certificates</h1>
+    </div>
+    {% if certificates %}
+    <div class="certs-grid">
+        {% for cert in certificates %}
+        <div class="cert-card">
+            <div class="cert-icon"><i class="fas fa-certificate"></i></div>
+            <div class="cert-body">
+                <h3>{{ cert.skill_certified }}</h3>
+                <p>{{ cert.program.title }}</p>
+                <div class="cert-meta">
+                    <span><i class="fas fa-id-card"></i> {{ cert.certificate_no }}</span>
+                    <span><i class="fas fa-calendar"></i> {{ cert.issued_date.strftime('%d %b %Y') }}</span>
+                </div>
+            </div>
+            <div class="cert-footer" style="display:flex;justify-content:space-between;align-items:center;">
+                <span class="badge badge-fulfilled">Certified ✓</span>
+                <a href="{{ url_for('participant.download_certificate', cert_id=cert.id) }}"
+                class="btn-primary-sm">
+                <i class="fas fa-download"></i> Download PDF
+            </a>
+        </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="not-available">
+        <i class="fas fa-certificate"></i>
+        <h3>No Certificates Yet</h3>
+        <p>Complete a training program to receive your digital certificate.</p>
+        <a href="{{ url_for('participant.programs') }}" class="btn-primary" style="margin-top:1rem;">
+            <i class="fas fa-book-open"></i> Browse Programs
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

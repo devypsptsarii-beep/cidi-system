@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Edit Profile - CIDI 4.0{% endblock %}
+{% block content %}
+<div class="dashboard">
+    <div class="dashboard-header">
+        <h1><i class="fas fa-user-edit"></i> Edit My Profile</h1>
+        <a href="{{ url_for('participant.dashboard') }}" class="btn-back">
+            <i class="fas fa-arrow-left"></i> Back
+        </a>
+    </div>
+    <div class="form-card">
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" name="full_name" value="{{ profile.full_name }}" required>
+            </div>
+            <div class="form-group">
+                <label>Gender</label>
+                <select name="gender">
+                    <option value="Male"   {% if profile.gender == 'Male'   %}selected{% endif %}>Male</option>
+                    <option value="Female" {% if profile.gender == 'Female' %}selected{% endif %}>Female</option>
+                </select>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Place of Birth</label>
+                    <input type="text" name="place_of_birth" value="{{ profile.place_of_birth }}">
+                </div>
+                <div class="form-group">
+                    <label>Date of Birth</label>
+                    <input type="date" name="date_of_birth"
+                           value="{{ profile.date_of_birth.strftime('%Y-%m-%d') }}">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>City</label>
+                    <input type="text" name="city" value="{{ profile.city or '' }}"
+                           placeholder="e.g. Jakarta">
+                </div>
+                <div class="form-group">
+                    <label>Working Status</label>
+                    <select name="working_status">
+                        <option value="unemployed" {% if profile.working_status == 'unemployed' or not profile.working_status %}selected{% endif %}>Unemployed</option>
+                        <option value="employed"   {% if profile.working_status == 'employed'   %}selected{% endif %}>Employed</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Address</label>
+                <textarea name="address" rows="3">{{ profile.address }}</textarea>
+            </div>
+            <div class="form-group">
+                <label>Phone Number</label>
+                <input type="text" name="phone_number" value="{{ profile.phone_number }}">
+            </div>
+            <div class="form-group">
+                <label>Highest Education</label>
+                <select name="education">
+                    <option value="SMA/SMK" {% if profile.education == 'SMA/SMK' %}selected{% endif %}>SMA / SMK</option>
+                    <option value="D3"      {% if profile.education == 'D3'      %}selected{% endif %}>D3 (Diploma)</option>
+                    <option value="S1"      {% if profile.education == 'S1'      %}selected{% endif %}>S1 (Bachelor)</option>
+                    <option value="S2"      {% if profile.education == 'S2'      %}selected{% endif %}>S2 (Master)</option>
+                    <option value="S3"      {% if profile.education == 'S3'      %}selected{% endif %}>S3 (PhD)</option>
+                </select>
+            </div>
+            <button type="submit" class="btn-submit">
+                <i class="fas fa-save"></i> Save Changes
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

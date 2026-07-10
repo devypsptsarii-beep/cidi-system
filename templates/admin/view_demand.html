@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}View Demand - Admin{% endblock %}
+{% block content %}
+<div class="dashboard">
+    <div class="dashboard-header">
+        <h1><i class="fas fa-file-alt"></i> Workforce Demand Details</h1>
+        <div style="display:flex;gap:0.75rem;">
+            <a href="{{ url_for('admin.demands') }}" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+            <a href="{{ url_for('admin.ai_recommendation') }}"
+               class="btn-ai" style="text-decoration:none;">
+                <i class="fas fa-robot"></i> AI Recommendation
+            </a>
+        </div>
+    </div>
+
+    <div class="profile-grid">
+        <!-- LEFT: DEMAND INFO -->
+        <div class="profile-card">
+            <div class="profile-avatar" style="background:#dbeafe;">
+                <i class="fas fa-file-alt" style="color:#1a56db;"></i>
+            </div>
+            <h2>{{ demand.skill_required }}</h2>
+            <span class="badge badge-{{ demand.status }}">
+                {{ demand.status }}
+            </span>
+
+            <div class="profile-details">
+                <div class="detail-row">
+                    <span class="detail-label">
+                        <i class="fas fa-building"></i> Industry
+                    </span>
+                    <span>
+                        {{ demand.user.industry_profile.industry_name
+                           if demand.user.industry_profile
+                           else demand.user.email }}
+                    </span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">
+                        <i class="fas fa-users"></i> Quantity
+                    </span>
+                    <span>{{ demand.quantity }} workers</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">
+                        <i class="fas fa-calendar"></i> Submitted
+                    </span>
+                    <span>
+                        {{ demand.submitted_at.strftime('%d %b %Y') }}
+                    </span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">
+                        <i class="fas fa-exclamation-circle"></i> Urgency
+                    </span>
+                    <span>{{ demand.urgency_level or '-' }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT: FULL DETAILS -->
+        <div class="profile-right">
+            <div class="profile-section">
+                <h3><i class="fas fa-briefcase"></i> Job Requirements</h3>
+                <div class="detail-row">
+                    <span class="detail-label">Job Position</span>
+                    <span>{{ demand.job_position or '-' }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Experience Level</span>
+                    <span>{{ demand.experience_level or '-' }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Min. Education</span>
+                    <span>{{ demand.min_education or '-' }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Work Location</span>
+                    <span>{{ demand.work_location or '-' }}</span>
+                </div>
+            </div>
+
+            <div class="profile-section">
+                <h3>
+                    <i class="fas fa-cogs"></i> Machines / Technologies Used
+                    <span style="color:#f97316;font-size:0.8rem;">
+                        ★ Key for AI analysis
+                    </span>
+                </h3>
+                <p style="color:var(--gray);font-size:0.95rem;line-height:1.7;
+                           background:var(--color-background-secondary);
+                           padding:1rem;border-radius:8px;">
+                    {{ demand.machines_used or 'Not specified' }}
+                </p>
+            </div>
+
+            <div class="profile-section">
+                <h3><i class="fas fa-comment-alt"></i> Additional Description</h3>
+                <p style="color:var(--gray);font-size:0.95rem;line-height:1.7;">
+                    {{ demand.description or 'No additional description.' }}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

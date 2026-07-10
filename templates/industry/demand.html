@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}Submit Demand - CIDI 4.0{% endblock %}
+{% block content %}
+<div class="dashboard">
+    <div class="dashboard-header">
+        <h1><i class="fas fa-plus-circle"></i> Submit Workforce Demand</h1>
+        <a href="{{ url_for('industry.dashboard') }}" class="btn-back">
+            <i class="fas fa-arrow-left"></i> Back
+        </a>
+    </div>
+    <div class="form-card">
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <h3 class="fields-title">
+                <i class="fas fa-briefcase"></i> Job Requirements
+            </h3>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Skill Required</label>
+                    <select name="skill_required" required>
+                        <option value="">-- Select Skill --</option>
+                        <option value="IoT (Internet of Things)">IoT (Internet of Things)</option>
+                        <option value="Artificial Intelligence">Artificial Intelligence</option>
+                        <option value="Big Data Analytics">Big Data Analytics</option>
+                        <option value="Cybersecurity">Cybersecurity</option>
+                        <option value="Cloud Computing">Cloud Computing</option>
+                        <option value="Robotics & Automation">Robotics & Automation</option>
+                        <option value="3D Printing">3D Printing</option>
+                        <option value="Digital Manufacturing">Digital Manufacturing</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Number of Workers Needed</label>
+                    <input type="number" name="quantity" min="1"
+                           placeholder="e.g. 5" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Job Position / Role Title</label>
+                <input type="text" name="job_position"
+                       placeholder="e.g. CNC Operator, IoT Engineer, Data Analyst">
+            </div>
+
+            <div class="form-group">
+                <label>
+                    Machines / Technologies Used
+                    <span style="color:var(--secondary);font-size:0.8rem;">
+                        ★ Important for AI analysis
+                    </span>
+                </label>
+                <textarea name="machines_used" rows="3"
+                    placeholder="e.g. Fanuc CNC Machine, Siemens PLC S7-1200, Arduino IoT sensors, TensorFlow, AWS Cloud..."></textarea>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Experience Level Required</label>
+                    <select name="experience_level">
+                        <option value="">-- Select Level --</option>
+                        <option value="Entry Level (Fresh Graduate)">Entry Level (Fresh Graduate)</option>
+                        <option value="Junior (1-2 years)">Junior (1-2 years)</option>
+                        <option value="Mid Level (3-5 years)">Mid Level (3-5 years)</option>
+                        <option value="Senior (5+ years)">Senior (5+ years)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Minimum Education</label>
+                    <select name="min_education">
+                        <option value="">-- Select Education --</option>
+                        <option value="SMA/SMK">SMA / SMK</option>
+                        <option value="D3 (Diploma)">D3 (Diploma)</option>
+                        <option value="S1 (Bachelor)">S1 (Bachelor)</option>
+                        <option value="S2 (Master)">S2 (Master)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Work Location / Site</label>
+                    <input type="text" name="work_location"
+                           placeholder="e.g. Factory Floor, Remote, Laboratory">
+                </div>
+                <div class="form-group">
+                    <label>Urgency Level</label>
+                    <select name="urgency_level">
+                        <option value="">-- Select Urgency --</option>
+                        <option value="Immediate (ASAP)">Immediate (ASAP)</option>
+                        <option value="Within 1-3 months">Within 1-3 months</option>
+                        <option value="Within 3-6 months">Within 3-6 months</option>
+                        <option value="Flexible (no rush)">Flexible (no rush)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Additional Description</label>
+                <textarea name="description" rows="3"
+                    placeholder="Any other specific requirements or details..."></textarea>
+            </div>
+
+            <button type="submit" class="btn-submit">
+                <i class="fas fa-paper-plane"></i> Submit Demand Request
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+{% block title %}Participant Profile - Admin{% endblock %}
+{% block content %}
+<div class="dashboard">
+    <div class="dashboard-header">
+        <h1><i class="fas fa-user"></i> Participant Profile</h1>
+        <div style="display:flex;gap:0.75rem;">
+            <a href="{{ url_for('admin.participants') }}" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+            <a href="{{ url_for('admin.delete_participant', id=profile.id) }}"
+               class="btn-danger-sm"
+               style="padding:10px 20px;"
+               onclick="return confirm('Are you sure you want to delete {{ profile.full_name }}? This will also delete their certificates and training records.')">
+                <i class="fas fa-trash"></i> Delete Participant
+            </a>
+        </div>
+    </div>
+
+    <div class="profile-grid">
+
+        <!-- LEFT: PROFILE CARD -->
+        <div class="profile-card">
+            <div class="profile-avatar">
+                <i class="fas fa-user-graduate"></i>
+            </div>
+            <h2>{{ profile.full_name }}</h2>
+            <span class="badge badge-{{
+                'fulfilled' if profile.working_status == 'employed'
+                else 'pending' }}">
+                {{ profile.working_status or 'unemployed' }}
+            </span>
+
+            <div class="profile-details">
+                <div class="detail-row">
+                    <span class="detail-label">
+                        <i class="fas fa-venus-mars"></i> Gender
+                    </span>
+                    <span>{{ profile.gender }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">
+                        <i class="fas fa-birthday-cake"></i> Age
+                    </span>
+                    <span>{{ profile.age }} years old</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">
+                        <i class="fas fa-map-marker-alt"></i> Place of Birth
+                    </span>
+                    <span>
+                        {{ profile.place_of_birth }},
+                        {{ profile.date_of_birth.strftime('%d %b %Y') }}
+                    </span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">
+                        <i class="fas fa-city"></i> City
+                    </span>
+                    <span>{{ profile.city or '-' }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">
+                        <i class="fas fa-home"></i> Address
+                    </span>
+                    <span>{{ profile.address }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">
+                        <i class="fas fa-phone"></i> Phone
+                    </span>
+                    <span>{{ profile.phone_number }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">
+                        <i class="fas fa-graduation-cap"></i> Education
+                    </span>
+                    <span>{{ profile.education }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">
+                        <i class="fas fa-envelope"></i> Email
+                    </span>
+                    <span>{{ profile.user.email }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">
+                        <i class="fas fa-tag"></i> Source
+                    </span>
+                    <span>
+                        {% if profile.user.is_imported %}
+                            <span class="badge badge-ongoing">Imported</span>
+                        {% else %}
+                            <span class="badge badge-approved">Self-registered</span>
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT: CERTIFICATES + HISTORY -->
+        <div class="profile-right">
+
+            <!-- CERTIFICATES -->
+            <div class="profile-section">
+                <h3>
+                    <i class="fas fa-certificate"></i>
+                    Certificates ({{ certs|length }})
+                </h3>
+                {% if certs %}
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Certificate No</th>
+                                <th>Skill Certified</th>
+                                <th>Program</th>
+                                <th>Issued Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for cert in certs %}
+                            <tr>
+                                <td><code>{{ cert.certificate_no }}</code></td>
+                                <td>
+                                    <span class="skill-tag">
+                                        {{ cert.skill_certified }}
+                                    </span>
+                                </td>
+                                <td>{{ cert.program.title }}</td>
+                                <td>
+                                    {{ cert.issued_date.strftime('%d %b %Y') }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="empty-text">No certificates yet.</p>
+                {% endif %}
+            </div>
+
+            <!-- TRAINING HISTORY -->
+            <div class="profile-section">
+                <h3>
+                    <i class="fas fa-history"></i>
+                    Training History ({{ regs|length }})
+                </h3>
+                {% if regs %}
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Program</th>
+                                <th>Status</th>
+                                <th>Registered On</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for reg in regs %}
+                            <tr>
+                                <td>{{ reg.program.title }}</td>
+                                <td>
+                                    <span class="badge badge-{{ reg.status }}">
+                                        {{ reg.status }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {{ reg.registered_at.strftime('%d %b %Y') }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="empty-text">No training history yet.</p>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

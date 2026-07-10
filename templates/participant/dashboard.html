@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Participant Dashboard - CIDI 4.0{% endblock %}
+{% block content %}
+<div class="dashboard">
+    <div class="dashboard-header">
+        <h1><i class="fas fa-user-graduate"></i>
+            Welcome, {{ profile.full_name if profile else 'Participant' }}!
+        </h1>
+        {% if profile %}
+        <p>Age: {{ profile.age }} | Education: {{ profile.education }}</p>
+        {% endif %}
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card blue">
+            <div class="stat-icon"><i class="fas fa-clipboard-list"></i></div>
+            <div class="stat-info"><h3>{{ my_regs|length }}</h3><p>Registrations</p></div>
+        </div>
+        <div class="stat-card green">
+            <div class="stat-icon"><i class="fas fa-certificate"></i></div>
+            <div class="stat-info"><h3>{{ my_certs|length }}</h3><p>Certificates</p></div>
+        </div>
+        <div class="stat-card orange">
+            <div class="stat-icon"><i class="fas fa-book-open"></i></div>
+            <div class="stat-info"><h3>{{ open_programs|length }}</h3><p>Open Programs</p></div>
+        </div>
+    </div>
+
+    <div class="quick-actions">
+        <h2>Quick Actions</h2>
+        <div class="action-grid">
+            <a href="{{ url_for('participant.programs') }}" class="action-card">
+                <i class="fas fa-book-open"></i>
+                <span>Browse Training Programs</span>
+            </a>
+            <a href="{{ url_for('participant.certificates') }}" class="action-card">
+                <i class="fas fa-certificate"></i>
+                <span>My Certificates</span>
+            </a>
+            <a href="{{ url_for('participant.edit_profile') }}" class="action-card">
+                <i class="fas fa-user-edit"></i>
+                <span>Edit My Profile</span>
+            </a>
+            <a href="{{ url_for('participant.history') }}" class="action-card">
+                <i class="fas fa-history"></i>
+                <span>Training History</span>
+            </a>
+            <a href="{{ url_for('participant.change_password') }}" class="action-card">
+                <i class="fas fa-key"></i>
+                <span>Change Password</span>
+            </a>
+        </div>
+    </div>
+
+    {% if my_regs %}
+    <div class="recent-section">
+        <h2>My Training Registrations</h2>
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Program</th><th>Skill</th><th>Status</th><th>Registered</th></tr>
+                </thead>
+                <tbody>
+                    {% for reg in my_regs %}
+                    <tr>
+                        <td>{{ reg.program.title }}</td>
+                        <td>{{ reg.program.skill_category }}</td>
+                        <td><span class="badge badge-{{ reg.status }}">{{ reg.status }}</span></td>
+                        <td>{{ reg.registered_at.strftime('%d %b %Y') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

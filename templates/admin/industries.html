@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Industries - Admin{% endblock %}
+{% block content %}
+<div class="dashboard">
+    <div class="dashboard-header">
+        <h1><i class="fas fa-building"></i> Industry Accounts</h1>
+    </div>
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Industry Name</th>
+                    <th>Sector</th>
+                    <th>Email</th>
+                    <th>Contact</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in industries %}
+                <tr>
+                    <td><strong>{{ user.industry_profile.industry_name if user.industry_profile else 'N/A' }}</strong></td>
+                    <td>{{ user.industry_profile.sector if user.industry_profile else 'N/A' }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.industry_profile.contact_number if user.industry_profile else 'N/A' }}</td>
+                    <td>
+                        {% if user.is_approved %}
+                            <span class="badge badge-fulfilled">Approved</span>
+                        {% else %}
+                            <span class="badge badge-pending">Pending</span>
+                        {% endif %}
+                    </td>
+                    <td class="action-buttons">
+                        {% if not user.is_approved %}
+                        <a href="{{ url_for('admin.approve_industry', id=user.id) }}"
+                           class="btn-success-sm">
+                            <i class="fas fa-check"></i> Approve
+                        </a>
+                        <a href="{{ url_for('admin.reject_industry', id=user.id) }}"
+                           class="btn-danger-sm"
+                           onclick="return confirm('Reject and delete this account?')">
+                            <i class="fas fa-times"></i> Reject
+                        </a>
+                        {% else %}
+                            <span style="color:#10b981;">✓ Active</span>
+                        {% endif %}
+                        <a href="{{ url_for('admin.delete_industry', id=user.id) }}"
+                           class="btn-danger-sm"
+                           onclick="return confirm('Are you sure you want to delete {{ user.industry_profile.industry_name if user.industry_profile else user.email }}? This will also delete all their demand requests.')">
+                            <i class="fas fa-trash"></i> Delete
+                        </a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="6" class="empty-row">No industry accounts yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

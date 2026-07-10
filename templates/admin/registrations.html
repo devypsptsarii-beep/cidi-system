@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Registrations - Admin{% endblock %}
+{% block content %}
+<div class="dashboard">
+    <div class="dashboard-header">
+        <h1><i class="fas fa-user-check"></i> Training Registrations</h1>
+    </div>
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Participant</th>
+                    <th>Program</th>
+                    <th>Registered</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reg in registrations %}
+                <tr>
+                    <td><strong>{{ reg.participant.full_name }}</strong></td>
+                    <td>{{ reg.program.title }}</td>
+                    <td>{{ reg.registered_at.strftime('%d %b %Y') }}</td>
+                    <td><span class="badge badge-{{ reg.status }}">{{ reg.status }}</span></td>
+                    <td class="action-buttons">
+                        {% if reg.status == 'pending' %}
+                        <a href="{{ url_for('admin.approve_registration', id=reg.id) }}" class="btn-success-sm">
+                            <i class="fas fa-check"></i> Approve
+                        </a>
+                        <a href="{{ url_for('admin.reject_registration', id=reg.id) }}" class="btn-danger-sm">
+                            <i class="fas fa-times"></i> Reject
+                        </a>
+                        {% elif reg.status == 'approved' %}
+                        <a href="{{ url_for('admin.issue_certificate', registration_id=reg.id) }}" class="btn-primary-sm">
+                            <i class="fas fa-certificate"></i> Issue Certificate
+                        </a>
+                        {% elif reg.status == 'completed' %}
+                            <span style="color:#10b981;">✓ Certificate Issued</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5" class="empty-row">No registrations yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

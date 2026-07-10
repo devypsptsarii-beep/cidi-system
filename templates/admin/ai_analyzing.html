@@ -1,0 +1,348 @@
+{% extends "base.html" %}
+{% block title %}AI Analysis - CIDI 4.0{% endblock %}
+{% block content %}
+<div class="dashboard">
+    <div class="dashboard-header">
+        <h1><i class="fas fa-robot"></i> AI Analysis Result</h1>
+        <a href="{{ url_for('admin.ai_recommendation') }}" class="btn-back">
+            <i class="fas fa-arrow-left"></i> Back
+        </a>
+    </div>
+
+    <!-- SELECTED DEMANDS SUMMARY -->
+    <div class="ai-demands-summary">
+        <h3>
+            <i class="fas fa-clipboard-list"></i>
+            Analyzing {{ selected_demands|length }} demand(s)
+        </h3>
+        <div class="demands-chips">
+            {% for d in selected_demands %}
+            <span class="demand-chip">
+                {{ d.user.industry_profile.industry_name
+                   if d.user.industry_profile else d.user.email }}
+                — {{ d.skill_required }}
+                {% if d.job_position %}({{ d.job_position }}){% endif %}
+            </span>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- AI RESULT -->
+    <div class="ai-result-card">
+        <div class="ai-result-header">
+            <i class="fas fa-lightbulb"></i>
+            <h3>AI training recommendation</h3>
+        </div>
+
+        {% if ai_error %}
+        <div class="alert alert-danger">
+            <i class="fas fa-exclamation-circle"></i>
+            <div>
+                <strong>AI Error:</strong> {{ ai_error }}
+                <br>
+                <small>Make sure ANTHROPIC_API_KEY is set in your .env file</small>
+            </div>
+        </div>
+
+        {% elif ai_result %}
+        <div id="ai-formatted-output"></div>
+        <textarea id="ai-raw-text" style="display:none;">{{ ai_result }}</textarea>
+
+        <!-- CREATE PROGRAM FORM -->
+        <div class="ai-create-form">
+            <h3>
+                <i class="fas fa-plus-circle"></i>
+                Create training program from this recommendation
+            </h3>
+            <form method="POST"
+                  action="{{ url_for('admin.ai_create_program') }}">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="form-group">
+                    <label>Program title</label>
+                    <input type="text" name="title" id="prog-title"
+                           required placeholder="Program title">
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea name="description" id="prog-desc" rows="6"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Skill category</label>
+                    <select name="skill_category" id="prog-skill" required>
+                        <option value="">-- Select --</option>
+                        <option value="IoT (Internet of Things)">IoT (Internet of Things)</option>
+                        <option value="Artificial Intelligence">Artificial Intelligence</option>
+                        <option value="Big Data Analytics">Big Data Analytics</option>
+                        <option value="Cybersecurity">Cybersecurity</option>
+                        <option value="Cloud Computing">Cloud Computing</option>
+                        <option value="Robotics & Automation">Robotics & Automation</option>
+                        <option value="3D Printing">3D Printing</option>
+                        <option value="Digital Manufacturing">Digital Manufacturing</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Start date</label>
+                        <input type="date" name="start_date" required>
+                    </div>
+                    <div class="form-group">
+                        <label>End date</label>
+                        <input type="date" name="end_date" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Capacity (participants)</label>
+                    <input type="number" name="capacity" id="prog-capacity"
+                           min="1" value="20" required>
+                </div>
+                <button type="submit" class="btn-submit">
+                    <i class="fas fa-save"></i> Create training program
+                </button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.ai-result-card {
+    background: var(--color-background-primary);
+    border-radius: var(--border-radius-lg);
+    border: 1px solid var(--color-border-tertiary);
+    padding: 2rem;
+    margin-top: 1.5rem;
+}
+.ai-result-header {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 1.5rem; color: #1a56db;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--color-border-tertiary);
+}
+.ai-result-header i  { font-size: 1.4rem; }
+.ai-result-header h3 { font-size: 1.15rem; font-weight: 600; margin: 0; }
+
+.ai-section { margin-bottom: 1.75rem; }
+.ai-section:last-child { margin-bottom: 0; }
+.ai-section-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: #1a56db;
+    margin-bottom: 0.75rem;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--color-border-tertiary);
+}
+.ai-field-row {
+    display: flex;
+    gap: 8px;
+    padding: 4px 0;
+    font-size: 0.95rem;
+}
+.ai-field-label { font-weight: 600; color: var(--color-text-primary); min-width: 160px; }
+.ai-field-value { color: var(--color-text-secondary); }
+.ai-paragraph {
+    color: var(--color-text-secondary);
+    line-height: 1.75;
+    font-size: 0.95rem;
+}
+.ai-bullet-list {
+    margin: 0; padding-left: 1.25rem;
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+    font-size: 0.95rem;
+}
+.ai-bullet-list li { margin-bottom: 6px; }
+.ai-schedule-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    margin-top: 4px;
+}
+.ai-schedule-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--color-border-tertiary);
+    vertical-align: top;
+}
+.ai-schedule-table td:first-child {
+    font-weight: 600;
+    color: #1a56db;
+    white-space: nowrap;
+    width: 110px;
+}
+.ai-badge-urgent {
+    display: inline-block;
+    background: var(--color-background-danger);
+    color: var(--color-text-danger);
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.ai-create-form {
+    border-top: 2px dashed var(--color-border-tertiary);
+    padding-top: 2rem;
+    margin-top: 2rem;
+}
+.ai-create-form h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #10b981;
+}
+.ai-demands-summary {
+    background: var(--color-background-secondary);
+    border-radius: var(--border-radius-md);
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+}
+.ai-demands-summary h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.demands-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.demand-chip {
+    background: #dbeafe; color: #1e40af;
+    padding: 4px 12px; border-radius: 20px;
+    font-size: 0.8rem; font-weight: 500;
+}
+</style>
+
+<script>
+function cleanText(s) {
+    return s.replace(/\*\*/g, '').replace(/\*/g, '').trim();
+}
+
+function formatAIResult() {
+    const raw = document.getElementById('ai-raw-text');
+    if (!raw) return;
+    const text = raw.value;
+    const output = document.getElementById('ai-formatted-output');
+
+    const knownHeaders = [
+        'RECOMMENDED TRAINING PROGRAM',
+        'WHY THIS TRAINING',
+        'TRAINING CONTENT OUTLINE',
+        'DETAILED DAILY SCHEDULE',
+        'TARGET PARTICIPANTS',
+        'URGENCY ASSESSMENT'
+    ];
+
+    const lines = text.split('\n').map(l => cleanText(l));
+    let html = '';
+    let currentSection = null;
+    let buffer = [];
+
+    function flushBuffer(sectionName) {
+        if (!buffer.length) return;
+
+        if (sectionName === 'RECOMMENDED TRAINING PROGRAM') {
+            html += '<div class="ai-section">';
+            buffer.forEach(line => {
+                if (line.includes(':') && !line.startsWith('=')) {
+                    const idx = line.indexOf(':');
+                    const label = line.substring(0, idx).trim();
+                    const value = line.substring(idx + 1).trim();
+                    if (label && value) {
+                        html += `<div class="ai-field-row"><span class="ai-field-label">${label}:</span><span class="ai-field-value">${value}</span></div>`;
+                    }
+                }
+            });
+            html += '</div>';
+
+        } else if (sectionName === 'TRAINING CONTENT OUTLINE' || sectionName === 'TARGET PARTICIPANTS') {
+            html += `<div class="ai-section"><div class="ai-section-title">${sectionName}</div><ul class="ai-bullet-list">`;
+            buffer.forEach(line => {
+                const clean = line.replace(/^-\s*/, '').trim();
+                if (clean) html += `<li>${clean}</li>`;
+            });
+            html += '</ul></div>';
+
+        } else if (sectionName === 'DETAILED DAILY SCHEDULE') {
+            html += `<div class="ai-section"><div class="ai-section-title">${sectionName}</div><table class="ai-schedule-table">`;
+            buffer.forEach(line => {
+                const match = line.match(/^(Day\s*[\d\-–]+|Week\s*[\d\-–]+)\s*:\s*(.+)/i);
+                if (match) {
+                    html += `<tr><td>${match[1]}</td><td>${match[2]}</td></tr>`;
+                } else if (line) {
+                    html += `<tr><td colspan="2">${line}</td></tr>`;
+                }
+            });
+            html += '</table></div>';
+
+        } else if (sectionName === 'URGENCY ASSESSMENT') {
+            const fullText = buffer.join(' ');
+            const isUrgent = /high priority|immediate|urgent/i.test(fullText);
+            html += `<div class="ai-section"><div class="ai-section-title">${sectionName}</div>`;
+            if (isUrgent) html += '<span class="ai-badge-urgent">High priority</span><br>';
+            html += `<p class="ai-paragraph">${fullText}</p></div>`;
+
+        } else if (sectionName === 'WHY THIS TRAINING') {
+            html += `<div class="ai-section"><div class="ai-section-title">${sectionName}</div><p class="ai-paragraph">${buffer.join(' ')}</p></div>`;
+        }
+        buffer = [];
+    }
+
+    for (let line of lines) {
+        if (!line || line.startsWith('=')) continue;
+        const matchedHeader = knownHeaders.find(h => line.toUpperCase() === h);
+        if (matchedHeader) {
+            flushBuffer(currentSection);
+            currentSection = matchedHeader;
+        } else {
+            buffer.push(line);
+        }
+    }
+    flushBuffer(currentSection);
+
+    output.innerHTML = html;
+}
+
+function autoFillForm() {
+    const raw = document.getElementById('ai-raw-text');
+    if (!raw) return;
+    const text = cleanText(raw.value);
+
+    const titleMatch = text.match(/Program Title:\s*(.+)/i);
+    if (titleMatch && document.getElementById('prog-title')) {
+        document.getElementById('prog-title').value = titleMatch[1].trim();
+    }
+
+    const capacityMatch = text.match(/Suggested Capacity:\s*(\d+)/i);
+    if (capacityMatch && document.getElementById('prog-capacity')) {
+        document.getElementById('prog-capacity').value = capacityMatch[1];
+    }
+
+    const skillMatch = text.match(/Skill Category:\s*(.+)/i);
+    if (skillMatch) {
+        const skill = skillMatch[1].trim().toLowerCase();
+        const select = document.getElementById('prog-skill');
+        if (select) {
+            for (let opt of select.options) {
+                if (opt.value.toLowerCase().includes(skill.substring(0, 8))) {
+                    opt.selected = true; break;
+                }
+            }
+        }
+    }
+
+    if (document.getElementById('prog-desc')) {
+        document.getElementById('prog-desc').value =
+            'AI-recommended training based on industry demand analysis.\n\n' + text;
+    }
+}
+
+window.onload = function() {
+    formatAIResult();
+    autoFillForm();
+};
+</script>
+{% endblock %}

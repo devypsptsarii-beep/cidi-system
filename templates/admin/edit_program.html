@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Edit Program - Admin{% endblock %}
+{% block content %}
+<div class="dashboard">
+    <div class="dashboard-header">
+        <h1><i class="fas fa-edit"></i> Edit Training Program</h1>
+        <a href="{{ url_for('admin.programs') }}" class="btn-back">
+            <i class="fas fa-arrow-left"></i> Back
+        </a>
+    </div>
+    <div class="form-card">
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="form-group">
+                <label>Program Title</label>
+                <input type="text" name="title" value="{{ program.title }}" required>
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea name="description" rows="4">{{ program.description or '' }}</textarea>
+            </div>
+            <div class="form-group">
+                <label>Skill Category</label>
+                <select name="skill_category" required>
+                    <option value="IoT (Internet of Things)"  {% if program.skill_category == 'IoT (Internet of Things)'  %}selected{% endif %}>IoT (Internet of Things)</option>
+                    <option value="Artificial Intelligence"   {% if program.skill_category == 'Artificial Intelligence'   %}selected{% endif %}>Artificial Intelligence</option>
+                    <option value="Big Data Analytics"        {% if program.skill_category == 'Big Data Analytics'        %}selected{% endif %}>Big Data Analytics</option>
+                    <option value="Cybersecurity"             {% if program.skill_category == 'Cybersecurity'             %}selected{% endif %}>Cybersecurity</option>
+                    <option value="Cloud Computing"           {% if program.skill_category == 'Cloud Computing'           %}selected{% endif %}>Cloud Computing</option>
+                    <option value="Robotics & Automation"     {% if program.skill_category == 'Robotics & Automation'     %}selected{% endif %}>Robotics & Automation</option>
+                    <option value="3D Printing"               {% if program.skill_category == '3D Printing'               %}selected{% endif %}>3D Printing</option>
+                    <option value="Digital Manufacturing"     {% if program.skill_category == 'Digital Manufacturing'     %}selected{% endif %}>Digital Manufacturing</option>
+                </select>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Start Date</label>
+                    <input type="date" name="start_date"
+                           value="{{ program.start_date.strftime('%Y-%m-%d') }}" required>
+                </div>
+                <div class="form-group">
+                    <label>End Date</label>
+                    <input type="date" name="end_date"
+                           value="{{ program.end_date.strftime('%Y-%m-%d') }}" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Capacity</label>
+                    <input type="number" name="capacity" value="{{ program.capacity }}" min="1" required>
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select name="status">
+                        <option value="open"      {% if program.status == 'open'      %}selected{% endif %}>Open</option>
+                        <option value="ongoing"   {% if program.status == 'ongoing'   %}selected{% endif %}>Ongoing</option>
+                        <option value="completed" {% if program.status == 'completed' %}selected{% endif %}>Completed</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn-submit">
+                <i class="fas fa-save"></i> Update Program
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

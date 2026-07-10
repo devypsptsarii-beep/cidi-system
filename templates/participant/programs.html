@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Training Programs - CIDI 4.0{% endblock %}
+{% block content %}
+<div class="dashboard">
+    <div class="dashboard-header">
+        <h1><i class="fas fa-book-open"></i> Available Training Programs</h1>
+    </div>
+    <div class="programs-grid">
+        {% for program in programs %}
+        <div class="program-card">
+            <div class="program-header status-{{ program.status }}">
+                <span class="badge badge-{{ program.status }}">{{ program.status }}</span>
+                <span class="skill-tag">{{ program.skill_category }}</span>
+            </div>
+            <div class="program-body">
+                <h3>{{ program.title }}</h3>
+                <p>{{ program.description or 'No description provided.' }}</p>
+                <div class="program-meta">
+                    <span><i class="fas fa-calendar"></i> {{ program.start_date.strftime('%d %b %Y') }}</span>
+                    <span><i class="fas fa-calendar-check"></i> {{ program.end_date.strftime('%d %b %Y') }}</span>
+                    <span><i class="fas fa-users"></i> Capacity: {{ program.capacity }}</span>
+                </div>
+            </div>
+            <div class="program-footer">
+                {% if program.id in registered_ids %}
+                    <button class="btn-registered" disabled>
+                        <i class="fas fa-check"></i> Already Registered
+                    </button>
+                {% elif program.status == 'open' %}
+                    <a href="{{ url_for('participant.register_training', program_id=program.id) }}"
+                       class="btn-submit" style="text-decoration:none;display:block;text-align:center;">
+                        <i class="fas fa-user-plus"></i> Register
+                    </a>
+                {% else %}
+                    <button class="btn-registered" disabled>Registration Closed</button>
+                {% endif %}
+            </div>
+        </div>
+        {% else %}
+        <div class="not-available">
+            <i class="fas fa-book"></i>
+            <h3>No Training Programs Available</h3>
+            <p>Check back later for new programs.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Import Participants - Admin{% endblock %}
+{% block content %}
+<div class="dashboard">
+    <div class="dashboard-header">
+        <h1><i class="fas fa-file-import"></i> Import Participants from Excel</h1>
+        <a href="{{ url_for('admin.participants') }}" class="btn-back">
+            <i class="fas fa-arrow-left"></i> Back
+        </a>
+    </div>
+
+    <!-- INSTRUCTIONS -->
+    <div class="import-instructions">
+        <h3><i class="fas fa-info-circle"></i> How to Import</h3>
+        <div class="import-steps">
+            <div class="import-step">
+                <div class="step-num">1</div>
+                <div>
+                    <strong>Download the Template</strong>
+                    <p>Download the Excel template and fill in participant data following the format provided.</p>
+                    <a href="{{ url_for('admin.download_participant_template') }}"
+                       class="btn-action" style="margin-top:8px;display:inline-flex;">
+                        <i class="fas fa-download"></i> Download Template
+                    </a>
+                </div>
+            </div>
+            <div class="import-step">
+                <div class="step-num">2</div>
+                <div>
+                    <strong>Fill in the Data</strong>
+                    <p>Open the template in Excel. Read the Instructions sheet carefully. Fill data from row 3 onwards (row 2 is the example).</p>
+                </div>
+            </div>
+            <div class="import-step">
+                <div class="step-num">3</div>
+                <div>
+                    <strong>Upload the File</strong>
+                    <p>Save your file and upload it below. The system will automatically create accounts for all participants.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- IMPORTANT NOTES -->
+    <div class="alert alert-warning" style="margin-bottom:1.5rem;">
+        <i class="fas fa-exclamation-triangle"></i>
+        <div>
+            <strong>Important Notes for Imported Accounts:</strong>
+            <ul style="margin:8px 0 0 1rem;">
+                <li>Imported participants will be automatically approved (no manual approval needed)</li>
+                <li>Email notifications will <strong>NOT</strong> be sent to imported accounts</li>
+                <li>Participants can log in immediately using the email and password you set in the Excel file</li>
+                <li>Duplicate emails will be skipped automatically</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- UPLOAD FORM -->
+    <div class="form-card">
+        <h3 style="margin-bottom:1.5rem;">
+            <i class="fas fa-upload"></i> Upload Excel File
+        </h3>
+        <form method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="form-group">
+                <label>Select Excel File (.xlsx only)</label>
+                <input type="file" name="excel_file" accept=".xlsx" required
+                       style="border:2px dashed #e5e7eb;padding:20px;
+                              border-radius:8px;width:100%;cursor:pointer;">
+            </div>
+            <button type="submit" class="btn-submit">
+                <i class="fas fa-file-import"></i> Import Participants
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

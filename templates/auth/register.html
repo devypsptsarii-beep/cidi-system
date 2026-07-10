@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% block title %}Register - CIDI 4.0{% endblock %}
+
+{% block content %}
+<section class="auth-section">
+    <div class="auth-container auth-register">
+        <div class="auth-header">
+            <div class="auth-icon"><i class="fas fa-user-plus"></i></div>
+            <h2>Create Account</h2>
+            <p>Join the CIDI 4.0 System</p>
+        </div>
+        <form method="POST" action="{{ url_for('auth.register') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <!-- ROLE SELECTION -->
+            <div class="form-group">
+                <label><i class="fas fa-users"></i> I am registering as:</label>
+                <div class="role-selector">
+                    <label class="role-option">
+                        <input type="radio" name="role" value="industry" id="role_industry">
+                        <div class="role-card">
+                            <i class="fas fa-building"></i>
+                            <span>Industry / Institution / Government</span>
+                        </div>
+                    </label>
+                    <label class="role-option">
+                        <input type="radio" name="role" value="participant" id="role_participant">
+                        <div class="role-card">
+                            <i class="fas fa-user-graduate"></i>
+                            <span>Individual / Participant</span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- COMMON FIELDS -->
+            <div class="form-group">
+                <label for="email"><i class="fas fa-envelope"></i> Email Address</label>
+                <input type="email" id="email" name="email" placeholder="Enter your email" required>
+            </div>
+            <div class="form-group">
+                <label for="password"><i class="fas fa-lock"></i> Password</label>
+                <input type="password" id="password" name="password" placeholder="Create a password" required>
+            </div>
+            <div class="form-group">
+                <label for="confirm_password"><i class="fas fa-lock"></i> Confirm Password</label>
+                <input type="password" id="confirm_password" name="confirm_password" placeholder="Repeat your password" required>
+            </div>
+
+            <!-- INDUSTRY FIELDS -->
+            <div id="industry-fields" class="extra-fields" style="display:none;">
+                <h3 class="fields-title"><i class="fas fa-building"></i> Industry Profile</h3>
+                <div class="form-group">
+                    <label for="industry_name">Industry / Institution Name</label>
+                    <input type="text" id="industry_name" name="industry_name" placeholder="e.g. PT Maju Bersama">
+                </div>
+                <div class="form-group">
+                    <label for="sector">Sector / Type</label>
+                    <select id="sector" name="sector">
+                        <option value="">-- Select Sector --</option>
+                        <option value="Manufacturing">Manufacturing</option>
+                        <option value="Technology">Technology</option>
+                        <option value="Energy">Energy</option>
+                        <option value="Healthcare">Healthcare</option>
+                        <option value="Education">Education</option>
+                        <option value="Government">Government</option>
+                        <option value="Logistics">Logistics</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="industry_address">Address</label>
+                    <textarea id="industry_address" name="industry_address" placeholder="Full address" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="contact_number">Contact Number</label>
+                    <input type="text" id="contact_number" name="contact_number" placeholder="e.g. +62 812 3456 7890">
+                </div>
+            </div>
+
+            <!-- PARTICIPANT FIELDS -->
+            <div id="participant-fields" class="extra-fields" style="display:none;">
+                <h3 class="fields-title"><i class="fas fa-user-graduate"></i> Participant Profile</h3>
+                <div class="form-group">
+                    <label for="full_name">Full Name</label>
+                    <input type="text" id="full_name" name="full_name" placeholder="Your full name">
+                </div>
+                <div class="form-group">
+                    <label for="gender">Gender</label>
+                    <select id="gender" name="gender">
+                        <option value="">-- Select Gender --</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="place_of_birth">Place of Birth</label>
+                        <input type="text" id="place_of_birth" name="place_of_birth" placeholder="e.g. Jakarta">
+                    </div>
+                    <div class="form-group">
+                        <label for="date_of_birth">Date of Birth</label>
+                        <input type="date" id="date_of_birth" name="date_of_birth">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="participant_address">Address</label>
+                    <textarea id="participant_address" name="participant_address" placeholder="Full address" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="phone_number">Phone Number</label>
+                    <input type="text" id="phone_number" name="phone_number" placeholder="e.g. +62 812 3456 7890">
+                </div>
+                <div class="form-group">
+                    <label for="education">Highest Education</label>
+                    <select id="education" name="education">
+                        <option value="">-- Select Education --</option>
+                        <option value="SMA/SMK">SMA / SMK</option>
+                        <option value="D3">D3 (Diploma)</option>
+                        <option value="S1">S1 (Bachelor)</option>
+                        <option value="S2">S2 (Master)</option>
+                        <option value="S3">S3 (PhD)</option>
+                    </select>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit">
+                <i class="fas fa-user-plus"></i> Create Account
+            </button>
+        </form>
+        <div class="auth-footer">
+            <p>Already have an account? <a href="{{ url_for('auth.login') }}">Login here</a></p>
+        </div>
+    </div>
+</section>
+{% endblock %}
