@@ -869,11 +869,16 @@ RECOMMENDED TRAINING PROGRAM
 ==============================
 Program Title: [specific title]
 Skill Category: [one of: IoT (Internet of Things), Artificial Intelligence, Big Data Analytics, Cybersecurity, Cloud Computing, Robotics & Automation, 3D Printing, Digital Manufacturing]
-Suggested Duration: [e.g. 2 weeks, 1 month - in total working days]
+Suggested Duration: [MAXIMUM 3 weeks / 15 working days. Keep it short and practical.]
 Suggested Capacity: [number of participants]
 
 WHY THIS TRAINING:
 [2-3 sentences explaining why this specific training is needed based on the demands]
+
+BASIC REQUIREMENTS:
+- Minimum Education: [e.g. SMK Teknik Komputer, D3 Teknik Informatika, S1 Engineering]
+- Prerequisite Knowledge: [e.g. Know basic Python, Understand basic electricity, No prior experience needed]
+- Target Experience Level: [e.g. Fresh graduate, 1-2 years work experience]
 
 TRAINING CONTENT OUTLINE:
 [4-6 plain text dash-bullet points, NO bold formatting, of what should be covered]
