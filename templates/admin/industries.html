@@ -24,39 +24,128 @@
                     <td>{{ user.industry_profile.sector if user.industry_profile else 'N/A' }}</td>
                     <td>{{ user.email }}</td>
                     <td>{{ user.industry_profile.contact_number if user.industry_profile else 'N/A' }}</td>
+
+                    <!-- STATUS COLUMN — uses account_status -->
                     <td>
-                        {% if user.is_approved %}
-                            <span class="badge badge-fulfilled">Approved</span>
+                        {% if user.account_status == 'approved' %}
+                            <span class="badge badge-approved">Approved</span>
+                        {% elif user.account_status == 'incomplete' %}
+                            <span class="badge badge-incomplete">Incomplete</span>
+                        {% elif user.account_status == 'rejected' %}
+                            <span class="badge badge-rejected">Rejected</span>
                         {% else %}
                             <span class="badge badge-pending">Pending</span>
                         {% endif %}
                     </td>
+
+                    <!-- ACTION COLUMN -->
                     <td class="action-buttons">
-                        {% if not user.is_approved %}
-                        <a href="{{ url_for('admin.approve_industry', id=user.id) }}"
-                           class="btn-success-sm">
-                            <i class="fas fa-check"></i> Approve
-                        </a>
-                        <a href="{{ url_for('admin.reject_industry', id=user.id) }}"
-                           class="btn-danger-sm"
-                           onclick="return confirm('Reject and delete this account?')">
-                            <i class="fas fa-times"></i> Reject
-                        </a>
-                        {% else %}
-                            <span style="color:#10b981;">✓ Active</span>
+                        {% if user.account_status != 'approved' %}
+                        <!-- APPROVE -->
+                        <form method="POST"
+                              action="{{ url_for('admin.approve_industry', id=user.id) }}"
+                              style="display:inline;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn-success-sm">
+                                <i class="fas fa-check"></i> Approve
+                            </button>
+                        </form>
                         {% endif %}
+
+                        {% if user.account_status != 'rejected' %}
+                        <!-- REJECT -->
+                        <form method="POST"
+                              action="{{ url_for('admin.reject_industry', id=user.id) }}"
+                              style="display:inline;"
+                              onsubmit="return confirm('Reject this account?')">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn-danger-sm">
+                                <i class="fas fa-times"></i> Reject
+                            </button>
+                        </form>
+                        {% endif %}
+
+                        <!-- INCOMPLETE — always visible, opens modal -->
+                        <button type="button"
+                                class="btn-primary-sm"
+                                style="background:#f97316;"
+                                onclick="openIncompleteModal({{ user.id }}, '{{ user.industry_profile.industry_name if user.industry_profile else user.email }}')">
+                            <i class="fas fa-exclamation"></i> Incomplete
+                        </button>
+
+                        <!-- DELETE -->
                         <a href="{{ url_for('admin.delete_industry', id=user.id) }}"
                            class="btn-danger-sm"
-                           onclick="return confirm('Are you sure you want to delete {{ user.industry_profile.industry_name if user.industry_profile else user.email }}? This will also delete all their demand requests.')">
+                           onclick="return confirm('Delete {{ user.industry_profile.industry_name if user.industry_profile else user.email }}? This will also delete all their demand requests.')">
                             <i class="fas fa-trash"></i> Delete
                         </a>
                     </td>
                 </tr>
                 {% else %}
-                <tr><td colspan="6" class="empty-row">No industry accounts yet.</td></tr>
+                <tr>
+                    <td colspan="6" class="empty-row">No industry accounts yet.</td>
+                </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 </div>
+
+<!-- ══ INCOMPLETE MODAL ══ -->
+<div id="incomplete-modal"
+     style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;
+            background:rgba(0,0,0,0.5);z-index:1000;
+            align-items:center;justify-content:center;">
+    <div style="background:white;border-radius:12px;padding:2rem;
+                width:90%;max-width:500px;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+        <h3 style="margin:0 0 0.5rem;display:flex;align-items:center;gap:8px;">
+            <i class="fas fa-exclamation-triangle" style="color:#f97316;"></i>
+            Mark as Incomplete
+        </h3>
+        <p id="modal-industry-name"
+           style="color:#6b7280;margin-bottom:1.25rem;font-size:0.9rem;"></p>
+
+        <form id="incomplete-form" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="form-group">
+                <label>Message to Industry</label>
+                <p style="font-size:0.8rem;color:#9ca3af;margin:4px 0 8px;">
+                    Explain clearly what information or documents are missing.
+                </p>
+                <textarea name="incomplete_message"
+                          rows="4"
+                          required
+                          placeholder="e.g. Please provide your company NPWP number and business registration certificate (SIUP/NIB) by updating your profile."></textarea>
+            </div>
+            <div style="display:flex;gap:1rem;margin-top:1.25rem;">
+                <button type="submit" class="btn-submit" style="flex:1;">
+                    <i class="fas fa-paper-plane"></i> Send &amp; Notify
+                </button>
+                <button type="button"
+                        onclick="closeIncompleteModal()"
+                        class="btn-back"
+                        style="flex:1;text-align:center;">
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openIncompleteModal(userId, industryName) {
+    document.getElementById('incomplete-modal').style.display = 'flex';
+    document.getElementById('modal-industry-name').textContent = 'Industry: ' + industryName;
+    document.getElementById('incomplete-form').action =
+        '/admin/industry/' + userId + '/incomplete';
+}
+function closeIncompleteModal() {
+    document.getElementById('incomplete-modal').style.display = 'none';
+}
+// Close modal when clicking outside
+document.getElementById('incomplete-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeIncompleteModal();
+});
+</script>
+
 {% endblock %}

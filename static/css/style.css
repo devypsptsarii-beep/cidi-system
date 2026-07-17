@@ -839,3 +839,10 @@ code {
     text-decoration: none;
 }
 .btn-ai:hover { opacity: 0.9; }
+
+.badge-on_progress { background:#dbeafe; color:#1e40af; }
+.badge-accepted    { background:#dcfce7; color:#166534; }
+.badge-finished    { background:#f3f4f6; color:#374151; }
+.badge-incomplete  { background:#fef3c7; color:#92400e; }
+.badge-rejected    { background:#fee2e2; color:#991b1b; }
+.badge-pending     { background:#f3f4f6; color:#6b7280; }
