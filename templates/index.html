@@ -14,28 +14,6 @@
                 <i class="fas fa-user-plus"></i> Register Now
             </a>
         </div>
-    </div>
-    <div class="hero-image">
-        <div class="hero-stats-box">
-            <div class="hero-stat">
-                <i class="fas fa-user-graduate"></i>
-                <span>Certified Workforce</span>
-            </div>
-            <div class="hero-stat">
-                <i class="fas fa-certificate"></i>
-                <span>Digital Certificates</span>
-            </div>
-            <div class="hero-stat">
-                <i class="fas fa-building"></i>
-                <span>Industry Partners</span>
-            </div>
-            <div class="hero-stat">
-                <i class="fas fa-chalkboard-teacher"></i>
-                <span>Training Programs</span>
-            </div>
-        </div>
-    </div>
-</section>
 
 <!-- HOW IT WORKS -->
 <section class="how-it-works">
@@ -71,6 +49,29 @@
     </div>
 </section>
 
+    </div>
+    <div class="hero-image">
+        <div class="hero-stats-box">
+            <div class="hero-stat">
+                <i class="fas fa-user-graduate"></i>
+                <span>Certified Workforce</span>
+            </div>
+            <div class="hero-stat">
+                <i class="fas fa-certificate"></i>
+                <span>Digital Certificates</span>
+            </div>
+            <div class="hero-stat">
+                <i class="fas fa-building"></i>
+                <span>Industry Partners</span>
+            </div>
+            <div class="hero-stat">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span>Training Programs</span>
+            </div>
+        </div>
+    </div>
+</section>
+
 <!-- OPEN TRAINING PROGRAMS -->
 <section class="home-programs">
     <div class="section-container">
@@ -86,22 +87,120 @@
                 </div>
                 <div class="program-body">
                     <h3>{{ program.title }}</h3>
-                    <p>{{ program.description or 'No description provided.' }}</p>
+                    <!-- SHORT description only — max 100 characters -->
+                    <p style="color:#6b7280;font-size:0.9rem;line-height:1.5;">
+                        {{ (program.description or 'No description provided.')[:100] }}{% if program.description and program.description|length > 100 %}...{% endif %}
+                    </p>
                     <div class="program-meta">
                         <span><i class="fas fa-calendar"></i> {{ program.start_date.strftime('%d %b %Y') }}</span>
                         <span><i class="fas fa-calendar-check"></i> {{ program.end_date.strftime('%d %b %Y') }}</span>
                         <span><i class="fas fa-users"></i> Capacity: {{ program.capacity }}</span>
                     </div>
                 </div>
-                <div class="program-footer">
-                    <a href="{{ url_for('auth.register') }}?role=participant" class="btn-submit"
-                       style="text-decoration:none;display:block;text-align:center;">
-                        <i class="fas fa-user-plus"></i> Register to Join
+                <!-- TWO BUTTONS: Details + Register -->
+                <div class="program-footer" style="display:flex;gap:8px;">
+                    <button onclick="openProgramModal('modal-{{ program.id }}')"
+                            style="flex:1;padding:10px;border:2px solid #1a56db;
+                                   color:#1a56db;background:white;border-radius:8px;
+                                   cursor:pointer;font-weight:600;font-size:0.9rem;">
+                        <i class="fas fa-info-circle"></i> Details
+                    </button>
+                    <a href="{{ url_for('auth.register') }}?role=participant"
+                       style="flex:1;text-align:center;padding:10px;
+                              background:#1a56db;color:white;border-radius:8px;
+                              text-decoration:none;font-weight:600;font-size:0.9rem;
+                              display:flex;align-items:center;justify-content:center;gap:6px;">
+                        <i class="fas fa-user-plus"></i> Register
                     </a>
                 </div>
             </div>
             {% endfor %}
         </div>
+
+        <!-- MODALS — one per program, hidden by default -->
+        {% for program in open_programs %}
+        <div id="modal-{{ program.id }}"
+             style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;
+                    background:rgba(0,0,0,0.55);z-index:9999;
+                    align-items:center;justify-content:center;padding:1rem;"
+             onclick="closeProgramModal(event, 'modal-{{ program.id }}')">
+            <div style="background:white;border-radius:14px;padding:2rem;
+                        width:90%;max-width:580px;max-height:85vh;
+                        overflow-y:auto;position:relative;">
+
+                <!-- Close button -->
+                <button onclick="openProgramModal('modal-{{ program.id }}'); return false;"
+                        onclick="document.getElementById('modal-{{ program.id }}').style.display='none'; document.body.style.overflow='';"
+                        style="position:absolute;top:1rem;right:1rem;background:none;
+                               border:none;font-size:1.5rem;cursor:pointer;
+                               color:#9ca3af;line-height:1;">&times;</button>
+
+                <!-- Header -->
+                <div style="margin-bottom:1.25rem;">
+                    <span class="skill-tag">{{ program.skill_category }}</span>
+                    <h2 style="margin:10px 0 0;font-size:1.2rem;">{{ program.title }}</h2>
+                </div>
+
+                <!-- Full description -->
+                <div style="color:#374151;line-height:1.75;margin-bottom:1.5rem;
+                            font-size:0.95rem;white-space:pre-line;">
+                    {{ program.description or 'No description provided.' }}
+                </div>
+
+                <!-- Program info -->
+                <div style="background:#f9fafb;border-radius:10px;
+                            padding:1rem;margin-bottom:1.5rem;">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+                        <div>
+                            <span style="font-size:0.75rem;color:#9ca3af;
+                                         text-transform:uppercase;letter-spacing:0.05em;">
+                                Start Date
+                            </span>
+                            <div style="font-weight:600;margin-top:2px;">
+                                {{ program.start_date.strftime('%d %B %Y') }}
+                            </div>
+                        </div>
+                        <div>
+                            <span style="font-size:0.75rem;color:#9ca3af;
+                                         text-transform:uppercase;letter-spacing:0.05em;">
+                                End Date
+                            </span>
+                            <div style="font-weight:600;margin-top:2px;">
+                                {{ program.end_date.strftime('%d %B %Y') }}
+                            </div>
+                        </div>
+                        <div>
+                            <span style="font-size:0.75rem;color:#9ca3af;
+                                         text-transform:uppercase;letter-spacing:0.05em;">
+                                Capacity
+                            </span>
+                            <div style="font-weight:600;margin-top:2px;">
+                                {{ program.capacity }} participants
+                            </div>
+                        </div>
+                        <div>
+                            <span style="font-size:0.75rem;color:#9ca3af;
+                                         text-transform:uppercase;letter-spacing:0.05em;">
+                                Status
+                            </span>
+                            <div style="margin-top:2px;">
+                                <span class="badge badge-open">Open</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Register button -->
+                <a href="{{ url_for('auth.register') }}?role=participant"
+                   style="display:block;text-align:center;padding:13px;
+                          background:#1a56db;color:white;border-radius:10px;
+                          text-decoration:none;font-weight:600;font-size:1rem;">
+                    <i class="fas fa-user-plus"></i> Register to Join
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+
         {% else %}
         <div class="not-available">
             <i class="fas fa-book"></i>
@@ -150,5 +249,28 @@
         </div>
     </div>
 </section>
+
+<!-- MODAL JAVASCRIPT -->
+<script>
+function openProgramModal(modalId) {
+    document.getElementById(modalId).style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+function closeProgramModal(event, modalId) {
+    // Only close if clicking the dark overlay, not the white card
+    if (event.target === document.getElementById(modalId)) {
+        document.getElementById(modalId).style.display = 'none';
+        document.body.style.overflow = '';
+    }
+}
+// Close button inside modal
+document.querySelectorAll('[data-close-modal]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        var modalId = this.getAttribute('data-close-modal');
+        document.getElementById(modalId).style.display = 'none';
+        document.body.style.overflow = '';
+    });
+});
+</script>
 
 {% endblock %}

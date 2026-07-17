@@ -101,6 +101,69 @@
         </div>
     </div>
 
+    <!-- TRAINING PROGRAMS LIST -->
+<div class="recent-section" style="margin-top:2rem;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+        <h2>Training Programs</h2>
+        <a href="{{ url_for('admin.add_program') }}" class="btn-action">
+            <i class="fas fa-plus"></i> Add Program
+        </a>
+    </div>
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Program Title</th>
+                    <th>Skill Category</th>
+                    <th>Dates</th>
+                    <th>Capacity</th>
+                    <th>Registrations</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for program in programs %}
+                <tr>
+                    <td><strong>{{ program.title }}</strong></td>
+                    <td><span class="skill-tag">{{ program.skill_category }}</span></td>
+                    <td style="font-size:0.85rem;">
+                        {{ program.start_date.strftime('%d %b %Y') }} —
+                        {{ program.end_date.strftime('%d %b %Y') }}
+                    </td>
+                    <td>{{ program.capacity }}</td>
+                    <td>
+                        <strong>{{ program.registrations | length }}</strong>
+                        <span style="color:#9ca3af;font-size:0.8rem;">registered</span>
+                    </td>
+                    <td>
+                        <span class="badge badge-{{ program.status }}">
+                            {{ program.status | capitalize }}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="{{ url_for('admin.edit_program', id=program.id) }}"
+                           class="btn-primary-sm">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                        <a href="{{ url_for('admin.delete_program', id=program.id) }}"
+                           class="btn-danger-sm"
+                           onclick="return confirm('Delete this program?')">
+                            <i class="fas fa-trash"></i> Delete
+                        </a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" class="empty-row">No training programs yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+    
     {% if recent_demands %}
     <div class="recent-section">
         <h2>Recent Workforce Demands</h2>
@@ -133,6 +196,7 @@
     </div>
     {% endif %}
 </div>
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script>

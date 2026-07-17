@@ -118,6 +118,19 @@ def dashboard():
         monthly_counts        = monthly_counts
     )
 
+@admin.route('/dashboard')
+@login_required
+@admin_required
+def dashboard():
+    # existing queries...
+    programs = TrainingProgram.query.order_by(TrainingProgram.created_at.desc()).all()
+    # pass programs to template
+    return render_template('admin/dashboard.html',
+        # existing variables...
+        programs=programs,
+        # ...
+    )
+
 # ── TRAINING PROGRAMS ─────────────────────────────────────────────────────────
 @admin.route('/programs')
 @login_required
@@ -539,29 +552,18 @@ def approve_industry(id):
     user.account_status = 'approved'
     user.incomplete_message = None
     db.session.commit()
-
-    # Send email notification
     try:
-        name = user.industry_profile.industry_name \
-               if user.industry_profile else user.email
+        name = user.industry_profile.industry_name if user.industry_profile else user.email
         msg = Message(
             subject='CIDI 4.0 — Account Approved',
             sender=current_app.config['MAIL_USERNAME'],
             recipients=[user.email]
         )
-        msg.body = f"""Dear {name},
-
-Your industry account on the CIDI 4.0 platform has been approved.
-
-You can now login and start using the system:
-https://cidi-system.onrender.com
-
-CIDI 4.0 Team"""
+        msg.body = f"Dear {name},\n\nYour industry account has been approved.\n\nLogin: https://cidi-system.onrender.com\n\nCIDI 4.0 Team"
         mail.send(msg)
     except Exception:
         pass
-
-    flash(f'Industry account approved successfully.', 'success')
+    flash('Industry account approved.', 'success')
     return redirect(url_for('admin.industries'))
 
 @admin.route('/industry/<int:id>/reject', methods=['POST'])
@@ -573,26 +575,18 @@ def reject_industry(id):
     user.account_status = 'rejected'
     user.rejected_at = datetime.utcnow()
     db.session.commit()
-    # Send rejection email
     try:
+        name = user.industry_profile.industry_name if user.industry_profile else user.email
         msg = Message(
             subject='CIDI 4.0 — Account Registration Update',
             sender=current_app.config['MAIL_USERNAME'],
             recipients=[user.email]
         )
-        msg.body = f"""Dear {user.industry_profile.industry_name if user.industry_profile else 'Applicant'},
-
-We regret to inform you that your industry account registration on the CIDI 4.0 platform has been rejected.
-
-If you believe this is an error or wish to re-apply, you may log in and submit a new application.
-
-Thank you for your interest in CIDI 4.0.
-
-CIDI 4.0 Team"""
+        msg.body = f"Dear {name},\n\nYour industry account registration was not approved.\n\nYou may log in to re-apply.\n\nCIDI 4.0 Team"
         mail.send(msg)
     except Exception:
         pass
-    flash(f'Industry account rejected: {user.email}', 'warning')
+    flash('Industry account rejected.', 'warning')
     return redirect(url_for('admin.industries'))
 
 @admin.route('/industry/<int:id>/incomplete', methods=['POST'])
