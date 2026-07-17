@@ -95,6 +95,26 @@
                     <input type="number" name="capacity" id="prog-capacity"
                            min="1" value="20" required>
                 </div>
+                <!-- Add this inside the create program form, before the submit button -->
+                <div class="form-group">
+                    <label>Link to Workforce Demands (optional)</label>
+                    <p style="font-size:0.8rem;color:#9ca3af;margin:4px 0 8px;">
+                        Selected demands will automatically change status to "On Progress"
+                    </p>
+                    {% for d in selected_demands %}
+                    <label style="display:flex;align-items:center;gap:8px;
+                                  padding:8px;border:1px solid #e5e7eb;
+                               border-radius:6px;margin-bottom:6px;cursor:pointer;">
+                      <input type="checkbox" name="linked_demand_ids"
+                            value="{{ d.id }}" checked>
+                        <span>
+                            <strong>{{ d.skill_required }}</strong> —
+                            {{ d.user.industry_profile.industry_name if d.user.industry_profile else d.user.email }}
+                            ({{ d.quantity }} workers)
+                        </span>
+                    </label>
+                    {% endfor %}
+                </div>
                 <button type="submit" class="btn-submit">
                     <i class="fas fa-save"></i> Create training program
                 </button>
