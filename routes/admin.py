@@ -539,8 +539,29 @@ def approve_industry(id):
     user.account_status = 'approved'
     user.incomplete_message = None
     db.session.commit()
-    send_industry_approval_email(user)
-    flash(f'Industry account approved: {user.email}', 'success')
+
+    # Send email notification
+    try:
+        name = user.industry_profile.industry_name \
+               if user.industry_profile else user.email
+        msg = Message(
+            subject='CIDI 4.0 — Account Approved',
+            sender=current_app.config['MAIL_USERNAME'],
+            recipients=[user.email]
+        )
+        msg.body = f"""Dear {name},
+
+Your industry account on the CIDI 4.0 platform has been approved.
+
+You can now login and start using the system:
+https://cidi-system.onrender.com
+
+CIDI 4.0 Team"""
+        mail.send(msg)
+    except Exception:
+        pass
+
+    flash(f'Industry account approved successfully.', 'success')
     return redirect(url_for('admin.industries'))
 
 @admin.route('/industry/<int:id>/reject', methods=['POST'])
