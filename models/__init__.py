@@ -20,6 +20,12 @@ class User(UserMixin, db.Model):
     participant_profile = db.relationship('ParticipantProfile', backref='user', uselist=False)
     workforce_demands   = db.relationship('WorkforceDemand',    backref='user')
 
+# Add these lines inside the User class
+    account_status     = db.Column(db.String(20), default='pending')
+    incomplete_message = db.Column(db.Text, nullable=True)
+    rejected_at        = db.Column(db.DateTime, nullable=True)
+    reapplied_at       = db.Column(db.DateTime, nullable=True)
+
 
 # ── INDUSTRY PROFILE ──────────────────────────────────────────────────────────
 class IndustryProfile(db.Model):
@@ -98,17 +104,26 @@ class Certificate(db.Model):
 
 # ── WORKFORCE DEMAND ──────────────────────────────────────────────────────────
 class WorkforceDemand(db.Model):
-    __tablename__    = 'workforce_demands'
-    id               = db.Column(db.Integer, primary_key=True)
-    user_id          = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    skill_required   = db.Column(db.String(200), nullable=False)
-    quantity         = db.Column(db.Integer,     nullable=False)
-    description      = db.Column(db.Text)
-    job_position     = db.Column(db.String(200))
-    machines_used    = db.Column(db.Text)
-    experience_level = db.Column(db.String(50))
-    min_education    = db.Column(db.String(50))
-    work_location    = db.Column(db.String(200))
-    urgency_level    = db.Column(db.String(50))
-    status           = db.Column(db.String(20),  default='pending')
-    submitted_at     = db.Column(db.DateTime,    default=datetime.utcnow)
+    __tablename__      = 'workforce_demands'
+    id                 = db.Column(db.Integer, primary_key=True)
+    user_id            = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    skill_required     = db.Column(db.String(200), nullable=False)
+    quantity           = db.Column(db.Integer, nullable=False)
+    description        = db.Column(db.Text)
+    job_position       = db.Column(db.String(200))
+    machines_used      = db.Column(db.Text)
+    experience_level   = db.Column(db.String(50))
+    min_education      = db.Column(db.String(50))
+    work_location      = db.Column(db.String(200))
+    urgency_level      = db.Column(db.String(50))
+    status             = db.Column(db.String(20), default='pending')
+    submitted_at       = db.Column(db.DateTime, default=datetime.utcnow)
+    # New fields
+    linked_program_id  = db.Column(db.Integer, db.ForeignKey('training_programs.id'), nullable=True)
+    feedback_rating    = db.Column(db.Integer, nullable=True)
+    feedback_comment   = db.Column(db.Text, nullable=True)
+    feedback_at        = db.Column(db.DateTime, nullable=True)
+    accepted_at        = db.Column(db.DateTime, nullable=True)
+    finished_at        = db.Column(db.DateTime, nullable=True)
+
+    linked_program     = db.relationship('TrainingProgram', foreign_keys=[linked_program_id])

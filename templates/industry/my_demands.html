@@ -17,6 +17,7 @@
                     <th>Description</th>
                     <th>Status</th>
                     <th>Submitted</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody>
@@ -25,11 +26,47 @@
                     <td><strong>{{ demand.skill_required }}</strong></td>
                     <td>{{ demand.quantity }}</td>
                     <td>{{ demand.description or '-' }}</td>
-                    <td><span class="badge badge-{{ demand.status }}">{{ demand.status }}</span></td>
+                    <td>
+                        <span class="badge badge-{{ demand.status }}">
+                            {{ demand.status | replace('_', ' ') | title }}
+                        </span>
+                    </td>
                     <td>{{ demand.submitted_at.strftime('%d %b %Y') }}</td>
+                    <td>
+                        {% if demand.status == 'accepted' %}
+                            <form method="POST"
+                                  action="{{ url_for('industry.finish_demand', id=demand.id) }}"
+                                  style="display:inline;">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit"
+                                        class="btn-primary-sm"
+                                        style="background:#10b981;"
+                                        onclick="return confirm('Mark this demand as finished? This means you have received the certified workforce.')">
+                                    <i class="fas fa-check-double"></i> Mark as Finished
+                                </button>
+                            </form>
+
+                        {% elif demand.status == 'finished' and demand.feedback_at %}
+                            <span class="badge badge-approved">
+                                <i class="fas fa-star"></i> Feedback Submitted
+                            </span>
+
+                        {% elif demand.status == 'finished' and not demand.feedback_at %}
+                            <a href="{{ url_for('industry.feedback', id=demand.id) }}"
+                               class="btn-primary-sm"
+                               style="background:#f97316;text-decoration:none;">
+                                <i class="fas fa-star"></i> Give Feedback
+                            </a>
+
+                        {% else %}
+                            <span style="color:#9ca3af;font-size:0.85rem;">—</span>
+                        {% endif %}
+                    </td>
                 </tr>
                 {% else %}
-                <tr><td colspan="5" class="empty-row">No demands submitted yet.</td></tr>
+                <tr>
+                    <td colspan="6" class="empty-row">No demands submitted yet.</td>
+                </tr>
                 {% endfor %}
             </tbody>
         </table>

@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Feedback — CIDI 4.0{% endblock %}
+{% block content %}
+<div class="dashboard">
+    <div class="dashboard-header">
+        <h1><i class="fas fa-star"></i> Workforce Feedback</h1>
+        <a href="{{ url_for('industry.my_demands') }}" class="btn-back">
+            <i class="fas fa-arrow-left"></i> Back
+        </a>
+    </div>
+
+    <div class="form-card">
+        <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:1.25rem;margin-bottom:2rem;">
+            <h3 style="color:#15803d;margin:0 0 6px;"><i class="fas fa-check-circle"></i> Demand Completed!</h3>
+            <p style="color:#166534;margin:0;">
+                Thank you for confirming. Please share your experience to help us improve.
+            </p>
+        </div>
+
+        <div style="margin-bottom:1.5rem;">
+            <p><strong>Skill Required:</strong> {{ demand.skill_required }}</p>
+            <p><strong>Quantity Needed:</strong> {{ demand.quantity }} workers</p>
+            {% if demand.linked_program %}
+            <p><strong>Training Programme:</strong> {{ demand.linked_program.title }}</p>
+            {% endif %}
+        </div>
+
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="form-group">
+                <label>Overall Satisfaction Rating</label>
+                <div style="display:flex;gap:12px;margin-top:8px;">
+                    {% for i in range(1, 6) %}
+                    <label style="display:flex;flex-direction:column;align-items:center;
+                                  gap:4px;cursor:pointer;font-size:0.85rem;color:#374151;">
+                        <input type="radio" name="rating" value="{{ i }}" required
+                               style="width:18px;height:18px;">
+                        <span style="font-size:1.4rem;">
+                            {% if i == 1 %}😞{% elif i == 2 %}😕{% elif i == 3 %}😐{% elif i == 4 %}😊{% else %}😄{% endif %}
+                        </span>
+                        {{ i }} — {% if i == 1 %}Poor{% elif i == 2 %}Fair{% elif i == 3 %}Good{% elif i == 4 %}Very Good{% else %}Excellent{% endif %}
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Was the skill match satisfactory?</label>
+                <select name="skill_match" required>
+                    <option value="">-- Select --</option>
+                    <option value="Yes — fully matched">Yes — fully matched our requirements</option>
+                    <option value="Partial — mostly matched">Partial — mostly matched but some gaps</option>
+                    <option value="No — did not match">No — did not match our requirements</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Comments and Suggestions</label>
+                <textarea name="comment" rows="5"
+                    placeholder="Please share your experience — what went well, what could be improved, how many workers you actually received, etc."></textarea>
+            </div>
+
+            <button type="submit" class="btn-submit">
+                <i class="fas fa-paper-plane"></i> Submit Feedback
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -530,57 +530,100 @@ def industries():
     all_industries = User.query.filter_by(role='industry').all()
     return render_template('admin/industries.html', industries=all_industries)
 
-@admin.route('/industries/approve/<int:id>')
+@admin.route('/industry/<int:id>/approve', methods=['POST'])
 @login_required
 @admin_required
 def approve_industry(id):
     user = User.query.get_or_404(id)
     user.is_approved = True
+    user.account_status = 'approved'
+    user.incomplete_message = None
     db.session.commit()
-
-    # Only send email if self-registered
-    if not user.is_imported:
-        industry_name = user.industry_profile.industry_name \
-                        if user.industry_profile else 'Your organization'
-        body = f"""
-        <p>Dear <strong>{industry_name}</strong>,</p>
-        <p>Your account on the CIDI 4.0 System has been <strong>approved</strong>.</p>
-        <p>You can now log in and access:</p>
-        <ul>
-            <li>View the certified workforce database</li>
-            <li>Submit workforce demand requests</li>
-            <li>Track your demand request status</li>
-        </ul>
-        """
-        sent = send_email(
-            subject    = 'CIDI 4.0 — Your Account Has Been Approved!',
-            recipients = [user.email],
-            html_body  = email_template(
-                title        = '✅ Account Approved!',
-                greeting     = '',
-                body_html    = body,
-                button_text  = 'Login Now',
-                button_url   = 'http://127.0.0.1:5000/auth/login'
-            )
-        )
-        if sent:
-            flash('Industry approved and notification email sent!', 'success')
-        else:
-            flash('Industry approved! (Email could not be sent — check MAIL settings in .env)', 'warning')
-    else:
-        flash('Industry account approved! (Imported account — no email sent)', 'success')
-
+    send_industry_approval_email(user)
+    flash(f'Industry account approved: {user.email}', 'success')
     return redirect(url_for('admin.industries'))
 
-@admin.route('/industries/reject/<int:id>')
+@admin.route('/industry/<int:id>/reject', methods=['POST'])
 @login_required
 @admin_required
 def reject_industry(id):
     user = User.query.get_or_404(id)
-    db.session.delete(user)
+    user.is_approved = False
+    user.account_status = 'rejected'
+    user.rejected_at = datetime.utcnow()
     db.session.commit()
-    flash('Industry account rejected and removed.', 'success')
+    # Send rejection email
+    try:
+        msg = Message(
+            subject='CIDI 4.0 — Account Registration Update',
+            sender=current_app.config['MAIL_USERNAME'],
+            recipients=[user.email]
+        )
+        msg.body = f"""Dear {user.industry_profile.industry_name if user.industry_profile else 'Applicant'},
+
+We regret to inform you that your industry account registration on the CIDI 4.0 platform has been rejected.
+
+If you believe this is an error or wish to re-apply, you may log in and submit a new application.
+
+Thank you for your interest in CIDI 4.0.
+
+CIDI 4.0 Team"""
+        mail.send(msg)
+    except Exception:
+        pass
+    flash(f'Industry account rejected: {user.email}', 'warning')
     return redirect(url_for('admin.industries'))
+
+@admin.route('/industry/<int:id>/incomplete', methods=['POST'])
+@login_required
+@admin_required
+def incomplete_industry(id):
+    user = User.query.get_or_404(id)
+    message = request.form.get('incomplete_message', '')
+    user.is_approved = False
+    user.account_status = 'incomplete'
+    user.incomplete_message = message
+    db.session.commit()
+    # Send incomplete email
+    try:
+        msg = Message(
+            subject='CIDI 4.0 — Action Required: Complete Your Registration',
+            sender=current_app.config['MAIL_USERNAME'],
+            recipients=[user.email]
+        )
+        msg.body = f"""Dear {user.industry_profile.industry_name if user.industry_profile else 'Applicant'},
+
+Your industry account on the CIDI 4.0 platform requires additional information before it can be approved.
+
+Message from Admin:
+{message}
+
+Please log in to your account and update your profile with the required information. Once completed, your account will be reviewed again.
+
+Login here: https://cidi-system.onrender.com
+
+CIDI 4.0 Team"""
+        mail.send(msg)
+    except Exception:
+        pass
+    flash(f'Industry notified of incomplete registration: {user.email}', 'info')
+    return redirect(url_for('admin.industries'))
+
+@admin.route('/demand/<int:id>/status', methods=['POST'])
+@login_required
+@admin_required
+def update_demand_status(id):
+    demand = WorkforceDemand.query.get_or_404(id)
+    new_status = request.form.get('status')
+    if new_status in ['pending', 'on_progress', 'accepted', 'finished']:
+        demand.status = new_status
+        if new_status == 'accepted':
+            demand.accepted_at = datetime.utcnow()
+        elif new_status == 'finished':
+            demand.finished_at = datetime.utcnow()
+        db.session.commit()
+        flash(f'Demand status updated to {new_status.replace("_", " ").title()}', 'success')
+    return redirect(url_for('admin.view_demand', id=id))
 
 @admin.route('/industries/delete/<int:id>')
 @login_required
@@ -937,4 +980,40 @@ def ai_create_program():
     db.session.add(program)
     db.session.commit()
     flash(f'Training program "{title}" created from AI recommendation!', 'success')
+    return redirect(url_for('admin.programs'))
+
+@admin.route('/ai-recommendation/create-program', methods=['POST'])
+@login_required
+@admin_required
+def ai_create_program():
+    title          = request.form.get('title')
+    description    = request.form.get('description')
+    skill_category = request.form.get('skill_category')
+    start_date     = request.form.get('start_date')
+    end_date       = request.form.get('end_date')
+    capacity       = request.form.get('capacity')
+    linked_demands = request.form.getlist('linked_demand_ids')
+
+    program = TrainingProgram(
+        title          = title,
+        description    = description,
+        skill_category = skill_category,
+        start_date     = date.fromisoformat(start_date),
+        end_date       = date.fromisoformat(end_date),
+        capacity       = int(capacity),
+        status         = 'open'
+    )
+    db.session.add(program)
+    db.session.flush()  # get program.id before commit
+
+    # Auto-update linked demands to on_progress
+    if linked_demands:
+        for demand_id in linked_demands:
+            demand = WorkforceDemand.query.get(int(demand_id))
+            if demand:
+                demand.linked_program_id = program.id
+                demand.status = 'on_progress'
+
+    db.session.commit()
+    flash(f'Training program "{title}" created! Linked demands updated to On Progress.', 'success')
     return redirect(url_for('admin.programs'))

@@ -184,3 +184,62 @@ def change_password():
         flash('Password changed successfully!', 'success')
         return redirect(url_for('industry.dashboard'))
     return render_template('industry/change_password.html')
+
+@industry.route('/demand/<int:id>/finish', methods=['POST'])
+@login_required
+@industry_required
+def finish_demand(id):
+    demand = WorkforceDemand.query.get_or_404(id)
+    if demand.user_id != current_user.id:
+        flash('Unauthorized.', 'danger')
+        return redirect(url_for('industry.my_demands'))
+    demand.status = 'finished'
+    demand.finished_at = datetime.utcnow()
+    db.session.commit()
+    flash('Demand marked as finished! Please share your feedback.', 'success')
+    return redirect(url_for('industry.feedback', id=id))
+
+@industry.route('/demand/<int:id>/feedback', methods=['GET', 'POST'])
+@login_required
+@industry_required
+def feedback(id):
+    demand = WorkforceDemand.query.get_or_404(id)
+    if demand.user_id != current_user.id:
+        flash('Unauthorized.', 'danger')
+        return redirect(url_for('industry.my_demands'))
+    if request.method == 'POST':
+        demand.feedback_rating  = int(request.form.get('rating', 0))
+        demand.feedback_comment = request.form.get('comment', '')
+        demand.feedback_at      = datetime.utcnow()
+        db.session.commit()
+        flash('Thank you for your feedback!', 'success')
+        return redirect(url_for('industry.my_demands'))
+    return render_template('industry/feedback.html', demand=demand)
+
+@industry.route('/reapply', methods=['POST'])
+@login_required
+def reapply():
+    if current_user.account_status != 'rejected':
+        return redirect(url_for('industry.dashboard'))
+    current_user.account_status = 'pending'
+    current_user.is_approved    = False
+    current_user.rejected_at    = None
+    current_user.reapplied_at   = datetime.utcnow()
+    db.session.commit()
+    # Notify admin
+    try:
+        admin_user = User.query.filter_by(role='admin').first()
+        if admin_user:
+            msg = Message(
+                subject='CIDI 4.0 — Industry Re-Application',
+                sender=current_app.config['MAIL_USERNAME'],
+                recipients=[admin_user.email]
+            )
+            name = current_user.industry_profile.industry_name \
+                   if current_user.industry_profile else current_user.email
+            msg.body = f"{name} has re-applied for an industry account. Please review."
+            mail.send(msg)
+    except Exception:
+        pass
+    flash('Your re-application has been submitted. Please wait for admin review.', 'info')
+    return redirect(url_for('auth.login'))
