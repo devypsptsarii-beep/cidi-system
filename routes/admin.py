@@ -24,9 +24,6 @@ def admin_required(f):
 
 def send_email(subject, recipients, html_body):
     """Helper function to send email safely"""
-    try:
-        from flask_mail import Message
-        from app import mail
         msg = Message(subject=subject, recipients=recipients)
         msg.html = html_body
         mail.send(msg)
