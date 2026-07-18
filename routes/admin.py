@@ -976,29 +976,6 @@ URGENCY ASSESSMENT:
         ai_result        = ai_result,
         ai_error         = ai_error
     )
-
-@admin.route('/ai-recommendation/create-program', methods=['POST'])
-@login_required
-@admin_required
-def ai_create_program():
-    title          = request.form.get('title')
-    description    = request.form.get('description')
-    skill_category = request.form.get('skill_category')
-    start_date     = request.form.get('start_date')
-    end_date       = request.form.get('end_date')
-    capacity       = request.form.get('capacity')
-
-    program = TrainingProgram(
-        title          = title,
-        description    = description,
-        skill_category = skill_category,
-        start_date     = date.fromisoformat(start_date),
-        end_date       = date.fromisoformat(end_date),
-        capacity       = int(capacity),
-        status         = 'open'
-    )
-    db.session.add(program)
-    db.session.commit()
     flash(f'Training program "{title}" created from AI recommendation!', 'success')
     return redirect(url_for('admin.programs'))
 
