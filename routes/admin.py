@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash, send_file, current_app
-from flask_mail import mail, Message
+from flask_mail import Message
 from flask_login import login_required, current_user
 from extensions import db
 from models import User, IndustryProfile, ParticipantProfile
@@ -23,7 +23,9 @@ def admin_required(f):
     return decorated
 
 def send_email(subject, recipients, html_body):
+    from app import mail
     """Helper function to send email safely"""
+    try:
         msg = Message(subject=subject, recipients=recipients)
         msg.html = html_body
         mail.send(msg)
