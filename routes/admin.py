@@ -1,9 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash, send_file, current_app
-from extensions import mail
+from extensions import mail, db
 from flask_mail import Message
-from extensions import mail
 from flask_login import login_required, current_user
-from extensions import db
 from models import User, IndustryProfile, ParticipantProfile
 from models import TrainingProgram, TrainingRegistration, Certificate, WorkforceDemand
 from datetime import date, datetime
