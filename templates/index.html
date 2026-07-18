@@ -9,11 +9,28 @@
         <div class="hero-badge">Industry 4.0 Workforce Development</div>
         <h1>Center for Digital Industry 4.0</h1>
         <p>Connecting certified Industry 4.0 professionals with industries, institutions, and government bodies. Building the future workforce through structured training and certification.</p>
-        <div class="hero-buttons">
-            <a href="{{ url_for('auth.register') }}" class="btn-primary">
-                <i class="fas fa-user-plus"></i> Register Now
-            </a>
+    </div>
+    <div class="hero-image">
+        <div class="hero-stats-box">
+            <div class="hero-stat">
+                <i class="fas fa-user-graduate"></i>
+                <span>Certified Workforce</span>
+            </div>
+            <div class="hero-stat">
+                <i class="fas fa-certificate"></i>
+                <span>Digital Certificates</span>
+            </div>
+            <div class="hero-stat">
+                <i class="fas fa-building"></i>
+                <span>Industry Partners</span>
+            </div>
+            <div class="hero-stat">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span>Training Programs</span>
+            </div>
         </div>
+    </div>
+</section>
 
 <!-- HOW IT WORKS -->
 <section class="how-it-works">
@@ -49,29 +66,6 @@
     </div>
 </section>
 
-    </div>
-    <div class="hero-image">
-        <div class="hero-stats-box">
-            <div class="hero-stat">
-                <i class="fas fa-user-graduate"></i>
-                <span>Certified Workforce</span>
-            </div>
-            <div class="hero-stat">
-                <i class="fas fa-certificate"></i>
-                <span>Digital Certificates</span>
-            </div>
-            <div class="hero-stat">
-                <i class="fas fa-building"></i>
-                <span>Industry Partners</span>
-            </div>
-            <div class="hero-stat">
-                <i class="fas fa-chalkboard-teacher"></i>
-                <span>Training Programs</span>
-            </div>
-        </div>
-    </div>
-</section>
-
 <!-- OPEN TRAINING PROGRAMS -->
 <section class="home-programs">
     <div class="section-container">
@@ -82,13 +76,13 @@
             {% for program in open_programs %}
             <div class="program-card">
                 <div class="program-header status-{{ program.status }}">
-                    <span class="badge badge-{{ program.status }}">{{ program.status }}</span>
+                    <span class="badge badge-{{ program.status }}">{{ program.status | capitalize }}</span>
                     <span class="skill-tag">{{ program.skill_category }}</span>
                 </div>
                 <div class="program-body">
                     <h3>{{ program.title }}</h3>
-                    <!-- SHORT description only — max 100 characters -->
-                    <p style="color:#6b7280;font-size:0.9rem;line-height:1.5;">
+                    <!-- SHORT description max 100 chars -->
+                    <p style="color:#6b7280;font-size:0.9rem;line-height:1.5;min-height:40px;">
                         {{ (program.description or 'No description provided.')[:100] }}{% if program.description and program.description|length > 100 %}...{% endif %}
                     </p>
                     <div class="program-meta">
@@ -97,7 +91,7 @@
                         <span><i class="fas fa-users"></i> Capacity: {{ program.capacity }}</span>
                     </div>
                 </div>
-                <!-- TWO BUTTONS: Details + Register -->
+                <!-- TWO BUTTONS -->
                 <div class="program-footer" style="display:flex;gap:8px;">
                     <button onclick="openProgramModal('modal-{{ program.id }}')"
                             style="flex:1;padding:10px;border:2px solid #1a56db;
@@ -117,7 +111,7 @@
             {% endfor %}
         </div>
 
-        <!-- MODALS — one per program, hidden by default -->
+        <!-- MODALS — one per program -->
         {% for program in open_programs %}
         <div id="modal-{{ program.id }}"
              style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;
@@ -129,25 +123,24 @@
                         overflow-y:auto;position:relative;">
 
                 <!-- Close button -->
-                <button onclick="openProgramModal('modal-{{ program.id }}'); return false;"
-                        onclick="document.getElementById('modal-{{ program.id }}').style.display='none'; document.body.style.overflow='';"
+                <button onclick="document.getElementById('modal-{{ program.id }}').style.display='none';document.body.style.overflow='';"
                         style="position:absolute;top:1rem;right:1rem;background:none;
-                               border:none;font-size:1.5rem;cursor:pointer;
-                               color:#9ca3af;line-height:1;">&times;</button>
+                               border:none;font-size:1.8rem;cursor:pointer;
+                               color:#9ca3af;line-height:1;padding:0;">&times;</button>
 
                 <!-- Header -->
-                <div style="margin-bottom:1.25rem;">
+                <div style="margin-bottom:1.25rem;padding-right:2rem;">
                     <span class="skill-tag">{{ program.skill_category }}</span>
                     <h2 style="margin:10px 0 0;font-size:1.2rem;">{{ program.title }}</h2>
                 </div>
 
                 <!-- Full description -->
                 <div style="color:#374151;line-height:1.75;margin-bottom:1.5rem;
-                            font-size:0.95rem;white-space:pre-line;">
+                            font-size:0.95rem;">
                     {{ program.description or 'No description provided.' }}
                 </div>
 
-                <!-- Program info -->
+                <!-- Program info grid -->
                 <div style="background:#f9fafb;border-radius:10px;
                             padding:1rem;margin-bottom:1.5rem;">
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
@@ -183,7 +176,7 @@
                                          text-transform:uppercase;letter-spacing:0.05em;">
                                 Status
                             </span>
-                            <div style="margin-top:2px;">
+                            <div style="margin-top:4px;">
                                 <span class="badge badge-open">Open</span>
                             </div>
                         </div>
@@ -257,20 +250,11 @@ function openProgramModal(modalId) {
     document.body.style.overflow = 'hidden';
 }
 function closeProgramModal(event, modalId) {
-    // Only close if clicking the dark overlay, not the white card
     if (event.target === document.getElementById(modalId)) {
         document.getElementById(modalId).style.display = 'none';
         document.body.style.overflow = '';
     }
 }
-// Close button inside modal
-document.querySelectorAll('[data-close-modal]').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-        var modalId = this.getAttribute('data-close-modal');
-        document.getElementById(modalId).style.display = 'none';
-        document.body.style.overflow = '';
-    });
-});
 </script>
 
 {% endblock %}
