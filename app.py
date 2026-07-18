@@ -56,8 +56,11 @@ def about():
     return render_template('about.html')
 
 with app.app_context():
-    db.create_all()
-    print("Database tables created successfully!")
+    try:
+        db.create_all()
+        print("Database tables created successfully!")
+    except Exception as e:
+        print(f"DB init warning: {e}")
 
 if __name__ == '__main__':
     debug_mode = os.getenv('FLASK_DEBUG', 'False') == 'True'
