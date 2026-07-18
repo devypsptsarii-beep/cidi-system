@@ -611,8 +611,8 @@ Login here: https://cidi-system.onrender.com
 
 CIDI 4.0 Team"""
         mail.send(msg)
-    except Exception:
-        pass
+    except Exception as e:
+        print(f"MAIL ERROR incomplete_industry: {e}")
     flash(f'Industry notified of incomplete registration: {user.email}', 'info')
     return redirect(url_for('admin.industries'))
 
