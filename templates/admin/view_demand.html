@@ -15,6 +15,66 @@
         </div>
     </div>
 
+    <!-- STATUS UPDATE BAR -->
+    <div style="background:var(--color-background-secondary);
+                border-radius:10px;padding:1.25rem;margin-bottom:1.5rem;
+                display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+        <div style="flex:1;">
+            <span style="font-size:0.85rem;color:#6b7280;font-weight:600;">
+                CURRENT STATUS
+            </span><br>
+            <span class="badge badge-{{ demand.status }}" style="margin-top:4px;font-size:0.95rem;">
+                {{ demand.status | replace('_', ' ') | title }}
+            </span>
+        </div>
+        <form method="POST"
+              action="{{ url_for('admin.update_demand_status', id=demand.id) }}"
+              style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <label style="font-size:0.85rem;font-weight:600;color:#374151;">
+                Change Status:
+            </label>
+            <select name="status"
+                    style="padding:8px 12px;border:1px solid #e5e7eb;
+                           border-radius:8px;font-size:0.9rem;
+                           background:white;cursor:pointer;">
+                <option value="pending"
+                    {% if demand.status == 'pending' %}selected{% endif %}>
+                    Pending
+                </option>
+                <option value="on_progress"
+                    {% if demand.status == 'on_progress' %}selected{% endif %}>
+                    On Progress
+                </option>
+                <option value="accepted"
+                    {% if demand.status == 'accepted' %}selected{% endif %}>
+                    Accepted
+                </option>
+                <option value="finished"
+                    {% if demand.status == 'finished' %}selected{% endif %}>
+                    Finished
+                </option>
+            </select>
+            <button type="submit" class="btn-action">
+                <i class="fas fa-save"></i> Update Status
+            </button>
+        </form>
+    </div>
+
+    {% if demand.linked_program %}
+    <!-- LINKED PROGRAM -->
+    <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;
+                padding:1rem 1.25rem;margin-bottom:1.5rem;">
+        <span style="font-size:0.8rem;color:#3b82f6;font-weight:700;">
+            LINKED TRAINING PROGRAM
+        </span>
+        <p style="margin:4px 0 0;font-weight:600;color:#1e40af;">
+            <i class="fas fa-chalkboard-teacher"></i>
+            {{ demand.linked_program.title }}
+        </p>
+    </div>
+    {% endif %}
+
     <div class="profile-grid">
         <!-- LEFT: DEMAND INFO -->
         <div class="profile-card">
@@ -23,9 +83,8 @@
             </div>
             <h2>{{ demand.skill_required }}</h2>
             <span class="badge badge-{{ demand.status }}">
-                {{ demand.status }}
+                {{ demand.status | replace('_', ' ') | title }}
             </span>
-
             <div class="profile-details">
                 <div class="detail-row">
                     <span class="detail-label">
@@ -47,9 +106,7 @@
                     <span class="detail-label">
                         <i class="fas fa-calendar"></i> Submitted
                     </span>
-                    <span>
-                        {{ demand.submitted_at.strftime('%d %b %Y') }}
-                    </span>
+                    <span>{{ demand.submitted_at.strftime('%d %b %Y') }}</span>
                 </div>
                 <div class="detail-row">
                     <span class="detail-label">
@@ -57,6 +114,22 @@
                     </span>
                     <span>{{ demand.urgency_level or '-' }}</span>
                 </div>
+                {% if demand.accepted_at %}
+                <div class="detail-row">
+                    <span class="detail-label">
+                        <i class="fas fa-check"></i> Accepted
+                    </span>
+                    <span>{{ demand.accepted_at.strftime('%d %b %Y') }}</span>
+                </div>
+                {% endif %}
+                {% if demand.finished_at %}
+                <div class="detail-row">
+                    <span class="detail-label">
+                        <i class="fas fa-flag"></i> Finished
+                    </span>
+                    <span>{{ demand.finished_at.strftime('%d %b %Y') }}</span>
+                </div>
+                {% endif %}
             </div>
         </div>
 
@@ -102,6 +175,27 @@
                     {{ demand.description or 'No additional description.' }}
                 </p>
             </div>
+
+            {% if demand.feedback_rating %}
+            <div class="profile-section">
+                <h3><i class="fas fa-star" style="color:#f59e0b;"></i> Industry Feedback</h3>
+                <div class="detail-row">
+                    <span class="detail-label">Rating</span>
+                    <span>
+                        {% for i in range(demand.feedback_rating) %}⭐{% endfor %}
+                        ({{ demand.feedback_rating }}/5)
+                    </span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Comment</span>
+                    <span>{{ demand.feedback_comment or '-' }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Submitted</span>
+                    <span>{{ demand.feedback_at.strftime('%d %b %Y') if demand.feedback_at else '-' }}</span>
+                </div>
+            </div>
+            {% endif %}
         </div>
     </div>
 </div>
