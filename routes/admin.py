@@ -81,6 +81,7 @@ def dashboard():
     pending_registrations = TrainingRegistration.query.filter_by(status='pending').count()
     recent_demands        = WorkforceDemand.query.order_by(
                                 WorkforceDemand.submitted_at.desc()).limit(5).all()
+    programs              = TrainingProgram.query.order_by(TrainingProgram.created_at.desc()).all()
     from sqlalchemy import func
     skill_data = db.session.query(
         Certificate.skill_certified,
@@ -115,21 +116,11 @@ def dashboard():
         employed              = employed,
         unemployed            = unemployed,
         monthly_labels        = monthly_labels,
-        monthly_counts        = monthly_counts
+        monthly_counts        = monthly_counts,
+        programs              = programs
     )
 
-@admin.route('/dashboard')
-@login_required
-@admin_required
-def dashboard():
-    # existing queries...
-    programs = TrainingProgram.query.order_by(TrainingProgram.created_at.desc()).all()
-    # pass programs to template
-    return render_template('admin/dashboard.html',
-        # existing variables...
-        programs=programs,
-        # ...
-    )
+
 
 # ── TRAINING PROGRAMS ─────────────────────────────────────────────────────────
 @admin.route('/programs')
