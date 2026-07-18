@@ -74,19 +74,19 @@
                     <tr>
                         <td>
                             <strong>
-                                {{ reg.participant.participant_profile.full_name
-                                   if reg.participant.participant_profile
-                                   else reg.participant.email }}
+                                {{ reg.participant.full_name
+                                   if reg.participant
+                                   else (reg.participant.user.email if reg.user else '-') }}
                             </strong>
                         </td>
-                        <td>{{ reg.participant.email }}</td>
+                        <td>{{ reg.participant.user.email }}</td>
                         <td>
-                            {{ reg.participant.participant_profile.education
-                               if reg.participant.participant_profile else '-' }}
+                            {{ reg.participant.education
+                               if reg.participant else '-' }}
                         </td>
                         <td>
-                            {{ reg.participant.participant_profile.city
-                               if reg.participant.participant_profile else '-' }}
+                            {{ reg.participant.city
+                               if reg.participant else '-' }}
                         </td>
                         <td>{{ reg.registered_at.strftime('%d %b %Y') }}</td>
                         <td>
@@ -126,7 +126,7 @@
                                 <input type="hidden" name="csrf_token"
                                        value="{{ csrf_token() }}">
                                 <input type="hidden" name="participant_id"
-                                       value="{{ reg.participant.id }}">
+                                       value="{{ reg.user.id if reg.user else '' }}">
                                 <input type="hidden" name="program_id"
                                        value="{{ program.id }}">
                                 <button type="submit" class="btn-primary-sm"
