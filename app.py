@@ -1,7 +1,6 @@
 from flask import Flask, render_template
 from dotenv import load_dotenv
 from flask_wtf.csrf import CSRFProtect
-from flask_mail import Mail
 import os
 
 load_dotenv()
@@ -20,7 +19,8 @@ app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
 app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_USERNAME')
 
 csrf = CSRFProtect(app)
-mail = Mail(app)
+from extensions import db, login_manager, mail
+mail.init_app(app)
 
 from extensions import db, login_manager
 db.init_app(app)
