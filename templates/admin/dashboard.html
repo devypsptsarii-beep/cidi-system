@@ -142,14 +142,19 @@
                         </span>
                     </td>
                     <td>
+                        <a href="{{ url_for('admin.programs') }}"
+                           class="btn-primary-sm"
+                           style="background:#7c3aed;">
+                            <i class="fas fa-users"></i> Participants
+                        </a>
                         <a href="{{ url_for('admin.edit_program', id=program.id) }}"
-                           class="btn-primary-sm">
-                            <i class="fas fa-edit"></i> Edit
+   class="btn-primary-sm">
+    <i class="fas fa-edit"></i> Edit
                         </a>
                         <a href="{{ url_for('admin.delete_program', id=program.id) }}"
                            class="btn-danger-sm"
-                           onclick="return confirm('Delete this program?')">
-                            <i class="fas fa-trash"></i> Delete
+                          onclick="return confirm('Delete this program?')">
+                           <i class="fas fa-trash"></i> Delete
                         </a>
                     </td>
                 </tr>
