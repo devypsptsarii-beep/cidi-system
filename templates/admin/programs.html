@@ -5,47 +5,165 @@
     <div class="dashboard-header">
         <h1><i class="fas fa-chalkboard-teacher"></i> Training Programs</h1>
         <a href="{{ url_for('admin.add_program') }}" class="btn-action">
-            <i class="fas fa-plus"></i> Add New Program
+            <i class="fas fa-plus"></i> Add Program
         </a>
     </div>
-    <div class="table-container">
-        <table class="data-table">
-            <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Skill Category</th>
-                    <th>Start Date</th>
-                    <th>End Date</th>
-                    <th>Capacity</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for program in programs %}
-                <tr>
-                    <td><strong>{{ program.title }}</strong></td>
-                    <td>{{ program.skill_category }}</td>
-                    <td>{{ program.start_date.strftime('%d %b %Y') }}</td>
-                    <td>{{ program.end_date.strftime('%d %b %Y') }}</td>
-                    <td>{{ program.capacity }}</td>
-                    <td><span class="badge badge-{{ program.status }}">{{ program.status }}</span></td>
-                    <td>
-                        <a href="{{ url_for('admin.edit_program', id=program.id) }}" class="btn-primary-sm">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                        <a href="{{ url_for('admin.delete_program', id=program.id) }}"
-                            class="btn-danger-sm"
-                            onclick="return confirm('Delete this program?')">
-                            <i class="fas fa-trash"></i>
-                        </a>
-                    </td>
-                </tr>
-                {% else %}
-                <tr><td colspan="7" class="empty-row">No training programs yet. Add one!</td></tr>
-                {% endfor %}
-            </tbody>
-        </table>
+
+    {% for program in programs %}
+    <div class="form-card" style="margin-bottom:2rem;">
+
+        <!-- PROGRAM HEADER -->
+        <div style="display:flex;justify-content:space-between;
+                    align-items:start;flex-wrap:wrap;gap:1rem;
+                    margin-bottom:1.25rem;padding-bottom:1.25rem;
+                    border-bottom:1px solid var(--color-border-tertiary,#e5e7eb);">
+            <div>
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+                    <span class="badge badge-{{ program.status }}">
+                        {{ program.status | capitalize }}
+                    </span>
+                    <span class="skill-tag">{{ program.skill_category }}</span>
+                </div>
+                <h2 style="margin:0;font-size:1.2rem;">{{ program.title }}</h2>
+                <p style="color:#6b7280;font-size:0.85rem;margin:4px 0 0;">
+                    <i class="fas fa-calendar"></i>
+                    {{ program.start_date.strftime('%d %b %Y') }} —
+                    {{ program.end_date.strftime('%d %b %Y') }}
+                    &nbsp;|&nbsp;
+                    <i class="fas fa-users"></i>
+                    Capacity: {{ program.capacity }}
+                    &nbsp;|&nbsp;
+                    <i class="fas fa-user-check"></i>
+                    {{ program.registrations | length }} registered
+                </p>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <a href="{{ url_for('admin.edit_program', id=program.id) }}"
+                   class="btn-primary-sm">
+                    <i class="fas fa-edit"></i> Edit
+                </a>
+                <a href="{{ url_for('admin.delete_program', id=program.id) }}"
+                   class="btn-danger-sm"
+                   onclick="return confirm('Delete this program?')">
+                    <i class="fas fa-trash"></i> Delete
+                </a>
+            </div>
+        </div>
+
+        <!-- PARTICIPANT LIST -->
+        {% if program.registrations %}
+        <h3 style="font-size:1rem;margin:0 0 1rem;color:#374151;">
+            <i class="fas fa-list"></i>
+            Registered Participants ({{ program.registrations | length }})
+        </h3>
+        <div class="table-container" style="margin:0;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Education</th>
+                        <th>City</th>
+                        <th>Registered</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reg in program.registrations %}
+                    <tr>
+                        <td>
+                            <strong>
+                                {{ reg.participant.participant_profile.full_name
+                                   if reg.participant.participant_profile
+                                   else reg.participant.email }}
+                            </strong>
+                        </td>
+                        <td>{{ reg.participant.email }}</td>
+                        <td>
+                            {{ reg.participant.participant_profile.education
+                               if reg.participant.participant_profile else '-' }}
+                        </td>
+                        <td>
+                            {{ reg.participant.participant_profile.city
+                               if reg.participant.participant_profile else '-' }}
+                        </td>
+                        <td>{{ reg.registered_at.strftime('%d %b %Y') }}</td>
+                        <td>
+                            <span class="badge badge-{{ reg.status }}">
+                                {{ reg.status | capitalize }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if reg.status == 'pending' %}
+                            <form method="POST"
+                                  action="{{ url_for('admin.approve_registration', id=reg.id) }}"
+                                  style="display:inline;">
+                                <input type="hidden" name="csrf_token"
+                                       value="{{ csrf_token() }}">
+                                <button type="submit" class="btn-success-sm">
+                                    <i class="fas fa-check"></i> Approve
+                                </button>
+                            </form>
+                            <form method="POST"
+                                  action="{{ url_for('admin.reject_registration', id=reg.id) }}"
+                                  style="display:inline;"
+                                  onsubmit="return confirm('Reject this registration?')">
+                                <input type="hidden" name="csrf_token"
+                                       value="{{ csrf_token() }}">
+                                <button type="submit" class="btn-danger-sm">
+                                    <i class="fas fa-times"></i> Reject
+                                </button>
+                            </form>
+
+                            {% elif reg.status == 'approved' %}
+                            <!-- Issue certificate if not yet issued -->
+                            {% set cert = reg.participant.certificates | selectattr('program_id', 'equalto', program.id) | list %}
+                            {% if not cert %}
+                            <form method="POST"
+                                  action="{{ url_for('admin.issue_certificate') }}"
+                                  style="display:inline;">
+                                <input type="hidden" name="csrf_token"
+                                       value="{{ csrf_token() }}">
+                                <input type="hidden" name="participant_id"
+                                       value="{{ reg.participant.id }}">
+                                <input type="hidden" name="program_id"
+                                       value="{{ program.id }}">
+                                <button type="submit" class="btn-primary-sm"
+                                        style="background:#7c3aed;">
+                                    <i class="fas fa-certificate"></i> Issue Cert
+                                </button>
+                            </form>
+                            {% else %}
+                            <span class="badge badge-approved">
+                                <i class="fas fa-certificate"></i> Cert Issued
+                            </span>
+                            {% endif %}
+
+                            {% elif reg.status == 'rejected' %}
+                            <span style="color:#9ca3af;font-size:0.85rem;">Rejected</span>
+
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% else %}
+        <div style="text-align:center;padding:2rem;color:#9ca3af;">
+            <i class="fas fa-inbox" style="font-size:2rem;margin-bottom:8px;display:block;"></i>
+            No participants registered yet.
+        </div>
+        {% endif %}
     </div>
+    {% else %}
+    <div class="not-available">
+        <i class="fas fa-chalkboard-teacher"></i>
+        <h3>No Training Programs Yet</h3>
+        <p>Click "Add Program" to create your first training program.</p>
+    </div>
+    {% endfor %}
 </div>
 {% endblock %}

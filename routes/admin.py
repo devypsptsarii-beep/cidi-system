@@ -137,7 +137,8 @@ def dashboard():
 @admin_required
 def programs():
     all_programs = TrainingProgram.query.order_by(
-                       TrainingProgram.created_at.desc()).all()
+        TrainingProgram.created_at.desc()
+    ).all()
     return render_template('admin/programs.html', programs=all_programs)
 
 @admin.route('/programs/add', methods=['GET', 'POST'])
@@ -704,15 +705,28 @@ def approve_registration(id):
 
     return redirect(url_for('admin.registrations'))
 
-@admin.route('/registrations/reject/<int:id>')
+@admin.route('/registration/<int:id>/reject', methods=['POST'])
 @login_required
 @admin_required
 def reject_registration(id):
     reg = TrainingRegistration.query.get_or_404(id)
     reg.status = 'rejected'
     db.session.commit()
-    flash('Registration rejected.', 'success')
-    return redirect(url_for('admin.registrations'))
+    # notify participant
+    try:
+        msg = Message(
+            subject='CIDI 4.0 — Training Registration Update',
+            sender=current_app.config['MAIL_USERNAME'],
+            recipients=[reg.participant.email]
+        )
+        name = reg.participant.participant_profile.full_name \
+               if reg.participant.participant_profile else reg.participant.email
+        msg.body = f"Dear {name},\n\nYour registration for {reg.program.title} has been rejected.\n\nCIDI 4.0 Team"
+        mail.send(msg)
+    except Exception:
+        pass
+    flash('Registration rejected.', 'warning')
+    return redirect(url_for('admin.programs'))
 
 @admin.route('/registrations/complete/<int:id>')
 @login_required
