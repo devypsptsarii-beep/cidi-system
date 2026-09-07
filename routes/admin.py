@@ -89,8 +89,10 @@ def dashboard():
     skill_labels = [s.skill_certified for s in skill_data]
     skill_counts = [s.count           for s in skill_data]
 
-    employed   = ParticipantProfile.query.filter_by(working_status='employed').count()
-    unemployed = ParticipantProfile.query.filter_by(working_status='unemployed').count()
+    employed      = ParticipantProfile.query.filter_by(working_status='employed').count()
+    unemployed    = ParticipantProfile.query.filter_by(working_status='unemployed').count()
+    student       = ParticipantProfile.query.filter_by(working_status='student').count()
+    entrepreneur  = ParticipantProfile.query.filter_by(working_status='entrepreneur').count()
 
     monthly_data = db.session.query(
         func.extract('month', Certificate.issued_date).label('month'),
@@ -114,6 +116,8 @@ def dashboard():
         skill_counts          = skill_counts,
         employed              = employed,
         unemployed            = unemployed,
+        student               = student,
+        entrepreneur          = entrepreneur,
         monthly_labels        = monthly_labels,
         monthly_counts        = monthly_counts,
         programs              = programs

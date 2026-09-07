@@ -235,13 +235,18 @@ new Chart(document.getElementById('skillChart'), {
 new Chart(document.getElementById('statusChart'), {
     type: 'doughnut',
     data: {
-        labels: ['Employed', 'Unemployed'],
+        labels: ['Employed', 'Unemployed', 'Student', 'Entrepreneur / Business'],
         datasets: [{
-            data: [employed, unemployed],
-            backgroundColor: ['#10b981', '#f97316']
+            data: [{{ employed }}, {{ unemployed }}, {{ student }}, {{ entrepreneur }}],
+            backgroundColor: ['#10b981', '#f97316', '#1a56db', '#7c3aed']
         }]
     },
-    options: { responsive: true }
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { position: 'bottom' }
+        }
+    }
 });
 
 new Chart(document.getElementById('monthlyChart'), {
