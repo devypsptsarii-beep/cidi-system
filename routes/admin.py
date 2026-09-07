@@ -664,7 +664,7 @@ def approve_registration(id):
     db.session.commit()
 
     # Only send email if self-registered
-    if not reg.participant.user.is_imported:
+    if reg.participant and reg.participant.user and not reg.participant.user.is_imported:
         body = f"""
         <p>Dear <strong>{reg.participant.full_name}</strong>,</p>
         <p>Your registration for the following training has been <strong>approved</strong>:</p>
@@ -683,7 +683,7 @@ def approve_registration(id):
                 greeting    = '',
                 body_html   = body,
                 button_text = 'View My Training',
-                button_url  = 'http://127.0.0.1:5000/auth/login'
+                button_url  = 'https://cidi-system.onrender.com/auth/login'
             )
         )
         if sent:
