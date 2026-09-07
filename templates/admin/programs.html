@@ -111,17 +111,32 @@
                                     <i class="fas fa-times"></i> Reject
                                 </button>
                             </form>
-
                             {% elif reg.status == 'approved' %}
                             <span class="badge badge-approved">
                                 <i class="fas fa-check"></i> Approved
                             </span>
-
                             {% elif reg.status == 'rejected' %}
                             <span style="color:#9ca3af;font-size:0.85rem;">Rejected</span>
                             {% endif %}
                         </td>
                     </tr>
                     {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div style="text-align:center;padding:2rem;color:#9ca3af;">
+            <i class="fas fa-inbox" style="font-size:2rem;margin-bottom:8px;display:block;"></i>
+            No participants registered yet.
+        </div>
+        {% endif %}
+    </div>
+    {% else %}
+    <div class="not-available">
+        <i class="fas fa-chalkboard-teacher"></i>
+        <h3>No Training Programs Yet</h3>
+        <p>Click "Add Program" to create your first training program.</p>
+    </div>
+    {% endfor %}
 </div>
 {% endblock %}
