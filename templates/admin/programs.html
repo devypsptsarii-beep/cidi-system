@@ -74,19 +74,17 @@
                     <tr>
                         <td>
                             <strong>
-                                {{ reg.participant.full_name
-                                   if reg.participant
-                                   else (reg.participant.user.email if reg.participant else '-') }}
+                                {{ reg.participant.full_name if reg.participant else '-' }}
                             </strong>
                         </td>
-                        <td>{{ reg.participant.user.email }}</td>
                         <td>
-                            {{ reg.participant.education
-                               if reg.participant else '-' }}
+                            {{ reg.participant.user.email if reg.participant and reg.participant.user else '-' }}
                         </td>
                         <td>
-                            {{ reg.participant.city
-                               if reg.participant else '-' }}
+                            {{ reg.participant.education if reg.participant else '-' }}
+                        </td>
+                        <td>
+                            {{ reg.participant.city if reg.participant else '-' }}
                         </td>
                         <td>{{ reg.registered_at.strftime('%d %b %Y') }}</td>
                         <td>
@@ -97,40 +95,35 @@
                         <td>
                             {% if reg.status == 'pending' %}
                             <form method="POST"
-                                  action="{{ url_for('admin.approve_registration', id=reg.id) }}"
-                                  style="display:inline;">
-                                <input type="hidden" name="csrf_token"
-                                       value="{{ csrf_token() }}">
+                                action="{{ url_for('admin.approve_registration', id=reg.id) }}"
+                                style="display:inline;">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 <button type="submit" class="btn-success-sm">
                                     <i class="fas fa-check"></i> Approve
                                 </button>
                             </form>
                             <form method="POST"
-                                  action="{{ url_for('admin.reject_registration', id=reg.id) }}"
-                                  style="display:inline;"
-                                  onsubmit="return confirm('Reject this registration?')">
-                                <input type="hidden" name="csrf_token"
-                                       value="{{ csrf_token() }}">
+                                action="{{ url_for('admin.reject_registration', id=reg.id) }}"
+                                style="display:inline;"
+                                onsubmit="return confirm('Reject this registration?')">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 <button type="submit" class="btn-danger-sm">
                                     <i class="fas fa-times"></i> Reject
                                 </button>
                             </form>
 
                             {% elif reg.status == 'approved' %}
-                            <!-- Issue certificate if not yet issued -->
-                            {% set cert = reg.participant.certificates | selectattr('program_id', 'equalto', program.id) | list %}
-                            {% if not cert %}
+                            {% if reg.participant %}
+                            {% set has_cert = reg.participant.certificates
+                                | selectattr('program_id', 'equalto', program.id)
+                            {% if not has_cert %}
                             <form method="POST"
                                   action="{{ url_for('admin.issue_certificate') }}"
                                   style="display:inline;">
-                                <input type="hidden" name="csrf_token"
-                                       value="{{ csrf_token() }}">
-                                <input type="hidden" name="participant_id"
-                                       value="{{ reg.participant.id if reg.participant else '' }}">
-                                <input type="hidden" name="program_id"
-                                       value="{{ program.id }}">
-                                <button type="submit" class="btn-primary-sm"
-                                        style="background:#7c3aed;">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <input type="hidden" name="participant_id" value="{{ reg.participant.id }}">
+                                <input type="hidden" name="program_id" value="{{ program.id }}">
+                                <button type="submit" class="btn-primary-sm" style="background:#7c3aed;">
                                     <i class="fas fa-certificate"></i> Issue Cert
                                 </button>
                             </form>
@@ -139,31 +132,13 @@
                                 <i class="fas fa-certificate"></i> Cert Issued
                             </span>
                             {% endif %}
+                            {% endif %}
 
                             {% elif reg.status == 'rejected' %}
                             <span style="color:#9ca3af;font-size:0.85rem;">Rejected</span>
-
                             {% endif %}
                         </td>
                     </tr>
                     {% endfor %}
-                </tbody>
-            </table>
-        </div>
-
-        {% else %}
-        <div style="text-align:center;padding:2rem;color:#9ca3af;">
-            <i class="fas fa-inbox" style="font-size:2rem;margin-bottom:8px;display:block;"></i>
-            No participants registered yet.
-        </div>
-        {% endif %}
-    </div>
-    {% else %}
-    <div class="not-available">
-        <i class="fas fa-chalkboard-teacher"></i>
-        <h3>No Training Programs Yet</h3>
-        <p>Click "Add Program" to create your first training program.</p>
-    </div>
-    {% endfor %}
 </div>
 {% endblock %}

@@ -659,7 +659,7 @@ def registrations():
                    TrainingRegistration.registered_at.desc()).all()
     return render_template('admin/registrations.html', registrations=all_regs)
 
-@admin.route('/registrations/approve/<int:id>')
+@admin.route('/registrations/approve/<int:id>', methods=['GET', 'POST'])
 @login_required
 @admin_required
 def approve_registration(id):
