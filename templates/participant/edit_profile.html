@@ -42,8 +42,10 @@
                 <div class="form-group">
                     <label>Working Status</label>
                     <select name="working_status">
-                        <option value="unemployed" {% if profile.working_status == 'unemployed' or not profile.working_status %}selected{% endif %}>Unemployed</option>
-                        <option value="employed"   {% if profile.working_status == 'employed'   %}selected{% endif %}>Employed</option>
+                        <option value="unemployed"   {% if profile.working_status == 'unemployed' or not profile.working_status %}selected{% endif %}>Unemployed</option>
+                        <option value="employed"     {% if profile.working_status == 'employed'     %}selected{% endif %}>Employed</option>
+                        <option value="student"      {% if profile.working_status == 'student'      %}selected{% endif %}>Student</option>
+                        <option value="entrepreneur" {% if profile.working_status == 'entrepreneur' %}selected{% endif %}>Entrepreneur / Business</option>
                     </select>
                 </div>
             </div>
