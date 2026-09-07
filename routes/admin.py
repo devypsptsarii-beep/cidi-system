@@ -130,15 +130,9 @@ def dashboard():
 @login_required
 @admin_required
 def programs():
-    from sqlalchemy.orm import joinedload
-    all_programs = TrainingProgram.query\
-        .options(
-            joinedload(TrainingProgram.registrations)
-            .joinedload(TrainingRegistration.participant)
-            .joinedload(ParticipantProfile.certificates)
-        )\
-        .order_by(TrainingProgram.created_at.desc())\
-        .all()
+    all_programs = TrainingProgram.query.order_by(
+        TrainingProgram.created_at.desc()
+    ).all()
     return render_template('admin/programs.html', programs=all_programs)
 
 @admin.route('/programs/add', methods=['GET', 'POST'])

@@ -113,29 +113,9 @@
                             </form>
 
                             {% elif reg.status == 'approved' %}
-                            {% if reg.participant %}
-                            {% set has_cert = [] %}
-                            {% if reg.participant and reg.participant.certificates %}
-                            {% set has_cert = reg.participant.certificates
-                                | selectattr('program_id', 'equalto', program.id) | list %}
-                            {% endif %}
-                            {% if not has_cert %}
-                            <form method="POST"
-                                  action="{{ url_for('admin.issue_certificate') }}"
-                                  style="display:inline;">
-                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                <input type="hidden" name="participant_id" value="{{ reg.participant.id }}">
-                                <input type="hidden" name="program_id" value="{{ program.id }}">
-                                <button type="submit" class="btn-primary-sm" style="background:#7c3aed;">
-                                    <i class="fas fa-certificate"></i> Issue Cert
-                                </button>
-                            </form>
-                            {% else %}
                             <span class="badge badge-approved">
-                                <i class="fas fa-certificate"></i> Cert Issued
+                                <i class="fas fa-check"></i> Approved
                             </span>
-                            {% endif %}
-                            {% endif %}
 
                             {% elif reg.status == 'rejected' %}
                             <span style="color:#9ca3af;font-size:0.85rem;">Rejected</span>
