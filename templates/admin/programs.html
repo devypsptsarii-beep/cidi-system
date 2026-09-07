@@ -114,8 +114,11 @@
 
                             {% elif reg.status == 'approved' %}
                             {% if reg.participant %}
+                            {% set has_cert = [] %}
+                            {% if reg.participant and reg.participant.certificates %}
                             {% set has_cert = reg.participant.certificates
-                                | selectattr('program_id', 'equalto', program.id)
+                                | selectattr('program_id', 'equalto', program.id) | list %}
+                            {% endif %}
                             {% if not has_cert %}
                             <form method="POST"
                                   action="{{ url_for('admin.issue_certificate') }}"
